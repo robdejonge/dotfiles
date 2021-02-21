@@ -1,0 +1,73 @@
+### COMMON ALIASES ###
+
+alias dh='ssh robdejonge@achebe.dreamhost.com'
+alias peel='ssh pi@peel.lan'
+alias pomelo='ssh rob@pomelo.lan'
+alias navel='ssh rob@navel.lan'
+alias yuzu='ssh rob@yuzu.lan'
+alias kumquat='ssh rob@kumquat.lan'
+alias sshaddon='ssh -l hassio -p 2222 navel.lan'
+
+alias list-ports='sudo lsof -i -P -n | grep LISTEN'
+alias list-leases='peel docker exec dnsmasq cat /var/lib/misc/dnsmasq.leases'
+
+alias log-sys='tail -f $SYSLOG'
+alias log-mqtt='mosquitto_sub -h mqtt.lan -t "#" -v'
+alias log-dhcp='peel sudo tail -n 20 -f /tmp/dnsmasq.log | grep "dnsmasq-dhcp\["'
+alias log-dns-int='peel sudo tail -n 20 -f /tmp/dnsmasq.log | grep "dnsmasq\["'
+alias log-srf-udp='kumquat docker logs srf-stick-receiver -f'
+alias log-srf-udp-yuzu='yuzu docker logs srf-stick-receiver -f'
+alias log-srf-mqtt='kumquat docker logs mqtt-publisher -f'
+alias log-ha='navel docker logs homeassistant -f'
+alias log-nginx='peel tail -f /opt/nginx/var/log/nginx/access.log'
+alias log-zigbee='kumquat tail -f /usr/share/zigbee-bridge/logs/zigbee2mqtt.log'
+
+
+
+alias epoch='date +"%s"'
+alias when='relative_string '
+
+# . and .. already exist, why not expand this?
+alias -g ...='../..'
+alias -g ....='../../..'
+alias -g .....='../../../..'
+
+mkcd() { mkdir $1; cd $1 }
+
+# colorized man pages
+man() {
+	env \
+		LESS_TERMCAP_md=$(tput bold; tput setaf 4) \
+		LESS_TERMCAP_me=$(tput sgr0) \
+		LESS_TERMCAP_mb=$(tput blink) \
+		LESS_TERMCAP_us=$(tput setaf 2) \
+		LESS_TERMCAP_ue=$(tput sgr0) \
+		LESS_TERMCAP_so=$(tput smso) \
+		LESS_TERMCAP_se=$(tput rmso) \
+		PAGER="${commands[less]:-$PAGER}" \
+		man "$@"
+}
+
+### OS-SPECIFIC ALIASES ###
+
+case "$PLATFORM" in 
+
+  linux)
+    alias lll='ls -alh --color=auto'
+    alias ll='ls -lh --color=auto'
+    alias l='ls --color=auto'
+    alias rbn='sudo shutdown --reboot now'
+    alias sdn='sudo shutdown --poweroff now'  
+    ;;
+
+  darwin)
+    alias lll='ls -alGh'
+    alias ll='ls -lGh'
+    alias l='ls -Gh'
+    alias f='open -a "Finder"'
+    alias code='open -a "Visual Studio Code"'
+    alias rbn='osascript -e "tell app \"loginwindow\" to «event aevtrrst»"'
+    alias sdn='osascript -e "tell app \"loginwindow\" to «event aevtrsdn»"'
+    ;;
+
+esacalias config='/usr/bin/git --git-dir=/Users/rob/.dotfiles/ --work-tree=/Users/rob'

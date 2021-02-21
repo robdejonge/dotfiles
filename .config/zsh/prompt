@@ -1,0 +1,29 @@
+### SET PROMPT ### 
+
+if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ] || [ -n "$SSH_CONNECTION" ]; then
+
+  # logged in through ssh
+  PROMPT=""
+  PROMPT+="%B%F{green}%n@%m%f%b"       # username@hostname, bold, green
+  PROMPT+=":"                          # colon, default 
+  PROMPT+="%B%F{blue}%~ %f%b"          # abs or home path, bold, blue
+  PROMPT+="%# "                        # privileged or not indication, default
+else
+
+  # local login
+  PROMPT=""
+  PROMPT+="%B%F{blue}%~ %f%b"          # abs or home path, bold, blue
+  PROMPT+="%# "                        # privileged or not indication, default
+fi
+
+case "$(uname -s)" in                  # start prompt with operating system logo  
+
+  Linux*)
+    PROMPT=$'\U1F427'' '$PROMPT
+    ;;
+
+  Darwin*)
+    PROMPT=$' '$PROMPT
+    ;;
+
+esac

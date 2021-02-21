@@ -1,0 +1,55 @@
+
+function sornot () {
+
+  local count=$1
+  local word=$2
+
+  if [ $count = 1 ]; then 
+    echo "$word"
+  else 
+    echo "$word""s"
+  fi 
+}
+
+function relative_seconds () {
+
+  local input=$1
+  local time_right_now=$(epoch)
+  echo $input - $time_right_now | bc -l 
+
+}
+
+function relative_string () {
+
+  # input an epoch timestamp
+
+  local relsec=$(relative_seconds $1)
+
+  if [ $relsec -lt 0 ]; then 
+     local prefix=""
+     local postfix=" ago"
+     local relsec=$(echo "$relsec * -1" | bc -l) # convert to positive
+  else 
+     local prefix="in "
+     local postfix=""
+  fi 
+
+  local days=$(scale=0; echo "$relsec/86400" | bc)
+  local hours=$(scale=0; echo "($relsec-($days*86400))/3600" | bc)
+  local minutes=$(scale=0; echo "($relsec-($days*86400)-($hours*3600))/60" | bc)
+  local seconds=$(scale=0; echo "$relsec-($days*86400)-($hours*3600)-($minutes*60)" | bc)
+
+  if [ $days -eq 0 ]; then 
+    if [ $hours -eq 0 ]; then 
+      if [ $minutes -eq 0 ]; then 
+	     printf '%s\n' "$prefix$seconds $(sornot $seconds "second")$postfix"
+      else
+        printf '%s\n' "$prefix$minutes $(sornot $minutes "minute")$postfix"
+      fi 
+    else   
+      printf '%s\n' "$prefix$hours $(sornot $hours "hour")$postfix"
+    fi 
+  else 
+    printf '%s\n' "$prefix$days $(sornot $days "day")$postfix"
+  fi 
+}
