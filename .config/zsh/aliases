@@ -70,4 +70,5 @@ case "$PLATFORM" in
     alias sdn='osascript -e "tell app \"loginwindow\" to «event aevtrsdn»"'
     ;;
 
-esacalias config='/usr/bin/git --git-dir=/Users/rob/.dotfiles/ --work-tree=/Users/rob'
+esac
+alias config='/usr/bin/git --git-dir=/Users/rob/.dotfiles/ --work-tree=/Users/rob'
