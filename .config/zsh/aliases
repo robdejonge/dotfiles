@@ -73,4 +73,5 @@ case "$PLATFORM" in
 esac
 
 # this one is used for the dotfiles repo
-alias config='/usr/bin/git --git-dir=/Users/rob/.dotfiles/ --work-tree=/Users/rob'
+
+alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
