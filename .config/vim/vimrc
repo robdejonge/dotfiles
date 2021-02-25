@@ -1,1 +1,23 @@
-set viminfo+=n~/.config/vim/viminfo
+set nocompatible
+set viminfo+=n$XDG_CACHE_HOME/vim/viminfo
+syntax on 
+
+set tabstop=4 softtabstop=4
+set shiftwidth=4
+set expandtab
+set smartindent
+
+set guicursor=
+set nu
+set nowrap
+set nohlsearch
+set noerrorbells
+set noswapfile
+set nobackup
+set undodir=$XDG_CACHE_HOME/vim/undodir
+set undofile
+set scrolloff=3
+set colorcolumn=129 
+
+set cursorline
+highlight CursorLine cterm=NONE ctermbg=255
