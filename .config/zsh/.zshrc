@@ -1,13 +1,5 @@
 ### THE COMMON STUFF ###
 
-# Get operating system
-unamestr=$(uname)
-PLATFORM=${unamestr:l} 
-unset unamestr
-
-# Some 
-
-
 # Configure zsh 
 setopt AUTO_CD    # enabled changing directories without typing 'cd' command
 autoload -U colors && colors
@@ -35,13 +27,13 @@ unset file
 
 ### THE OS-SPECIFIC STUFF ###
 
-case "$PLATFORM" in 
+case "$OSTYPE" in 
 
-  linux)
+  linux*)
     export SYSLOG=/var/log/syslog
     ;;
 
-  darwin)
+  darwin*)
     export SYSLOG=/var/log/system.log 
     export INBOX=${HOME}/Desktop/Inbox
     export OUTBOX=${HOME}/Desktop/Outbox

@@ -6,26 +6,27 @@ alias pomelo='ssh rob@pomelo.lan'
 alias navel='ssh rob@navel.lan'
 alias yuzu='ssh rob@yuzu.lan'
 alias kumquat='ssh rob@kumquat.lan'
-alias sshaddon='ssh -l hassio -p 2222 navel.lan'
+alias sshaddon='ssh hassio@navel.lan -p 2222'
 
 alias list-ports='sudo lsof -i -P -n | grep LISTEN'
-alias list-leases='peel docker exec dnsmasq cat /var/lib/misc/dnsmasq.leases'
+alias list-leases='peel cat /opt/dnsmasq/var/lib/misc/dnsmasq.leases'
 
 alias log-sys='tail -f $SYSLOG'
 alias log-mqtt='mosquitto_sub -h mqtt.lan -t "#" -v'
-alias log-dhcp='peel sudo tail -n 20 -f /tmp/dnsmasq.log | grep "dnsmasq-dhcp\["'
-alias log-dns-int='peel sudo tail -n 20 -f /tmp/dnsmasq.log | grep "dnsmasq\["'
+alias log-dhcp='peel sudo tail -n 20 -f /opt/dnsmasq/var/log/dnsmasq.log | grep "dnsmasq-dhcp\["'
+alias log-dns='peel sudo tail -n 20 -f /opt/dnsmasq/var/log/dnsmasq.log | grep "dnsmasq\["'
 alias log-srf-udp='kumquat docker logs srf-stick-receiver -f'
-alias log-srf-udp-yuzu='yuzu docker logs srf-stick-receiver -f'
 alias log-srf-mqtt='kumquat docker logs mqtt-publisher -f'
 alias log-ha='navel docker logs homeassistant -f'
 alias log-nginx='peel tail -f /opt/nginx/var/log/nginx/access.log'
 alias log-zigbee='kumquat tail -f /usr/share/zigbee-bridge/logs/zigbee2mqtt.log'
+alias esphome='yuzu docker -it exec esphome esphome'
 
 
+alias grep='grep --color=auto'
 
 alias epoch='date +"%s"'
-alias when='relative_string '
+alias when='relative_string'
 
 # . and .. already exist, why not expand this?
 alias -g ...='../..'
@@ -50,9 +51,9 @@ man() {
 
 ### OS-SPECIFIC ALIASES ###
 
-case "$PLATFORM" in 
+case "$OSTYPE" in 
 
-  linux)
+  linux*)
     alias lll='ls -alh --color=auto'
     alias ll='ls -lh --color=auto'
     alias l='ls --color=auto'
@@ -60,7 +61,7 @@ case "$PLATFORM" in
     alias sdn='sudo shutdown --poweroff now'  
     ;;
 
-  darwin)
+  darwin*)
     alias lll='ls -alGh'
     alias ll='ls -lGh'
     alias l='ls -Gh'
@@ -73,5 +74,4 @@ case "$PLATFORM" in
 esac
 
 # this one is used for the dotfiles repo
-
 alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
