@@ -16,12 +16,15 @@ autoload -U colors && colors
 setopt HIST_SAVE_NO_DUPS
 setopt inc_append_history
 setopt share_history
+HISTFILE=${ZCACHEDIR}/history
+export HISTSIZE=10000000
+export SAVEHIST=10000000
 
 # Basic auto/tab complete
 autoload -U compinit
 zstyle ':completion:*' menu select
 zmodload zsh/complist
-compinit
+compinit -d ${ZCACHEDIR}/zcompdump-$ZSH_VERSION
 _comp_options+=(globdots)		# Include hidden files.
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 
