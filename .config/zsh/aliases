@@ -24,6 +24,9 @@ alias esphome='yuzu docker -it exec esphome esphome'
 
 
 alias grep='grep --color=auto'
+alias df='df -H'
+alias du='du -ch'
+alias apt-get='sudo apt-get'
 
 alias epoch='date +"%s"'
 alias when='relative_string'
@@ -67,8 +70,9 @@ case "$OSTYPE" in
     alias l='ls -Gh'
     alias f='open -a "Finder"'
     alias code='open -a "Visual Studio Code"'
-    alias rbn='osascript -e "tell app \"loginwindow\" to «event aevtrrst»"'
-    alias sdn='osascript -e "tell app \"loginwindow\" to «event aevtrsdn»"'
+    alias rbn='sudo shutdown -h now'
+    alias sdn='sudo shutdown -r now'
+    alias flushdns='dscacheutil -flushcache'
     ;;
 
 esac

@@ -2,10 +2,12 @@ set nocompatible
 set viminfo+=n$XDG_CACHE_HOME/vim/viminfo
 syntax on 
 
-set tabstop=4 softtabstop=4
+set tabstop=4 
+set softtabstop=4
 set shiftwidth=4
 set expandtab
 set smartindent
+set ai
 
 set guicursor=
 set nu
