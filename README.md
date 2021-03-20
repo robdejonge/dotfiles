@@ -36,11 +36,11 @@ Step 1. Ignore the repositoy in any other reposities that might be there
     
 Step 2. Clone the repository from your server of choice into the local location 
 
-    git clone --bare <REMOTE_URL> $HOME/.repo
+    git clone --bare git@github.com:robdejonge/dotfiles.git $HOME/.repo
     
 Step 3. Add a setting to not show untracked files (I create no alias, as I assume aliases will soon be loaded!) 
 
-    git config --git-dir=$HOME/.repo --work-tree $HOME --local status.showUntrackedFiles no
+    git --git-dir=$HOME/.repo --work-tree $HOME config --local status.showUntrackedFiles no
     
 Step 4. Put all the files stored in the repo, in their actual locations
 
