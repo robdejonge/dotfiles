@@ -78,4 +78,4 @@ case "$OSTYPE" in
 esac
 
 # this one is used for the dotfiles repo
-alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+alias config='/usr/bin/git --git-dir=$HOME/.repo/ --work-tree=$HOME'
