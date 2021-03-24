@@ -27,6 +27,7 @@ case "$OSTYPE" in
 
   linux*)
     export SYSLOG=/var/log/syslog
+    export PATH=${PATH}:/opt/local/bin
     ;;
 
   darwin*)
