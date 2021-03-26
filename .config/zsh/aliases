@@ -74,6 +74,12 @@ case "$OSTYPE" in
     alias sdn='sudo shutdown -r now'
     alias flushdns='dscacheutil -flushcache'
     ;;
+    
+  openbsd*)
+    alias lll='ls -alh'
+    alias ll='ls -lh'
+    alias l='ls -h'
+    ;;
 
 esac
 
