@@ -36,6 +36,11 @@ case "$OSTYPE" in
     export OUTBOX=${HOME}/Desktop/Outbox
     export PATH=${PATH}:${HOME}/Scripts
     ;;
+    
+  openbsd*)
+    export SYSLOG=/var/log/messages
+    export PATH=${PATH}:/opt/local/bin
+    ;;
 
 esac
 
