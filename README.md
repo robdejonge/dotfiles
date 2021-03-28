@@ -45,6 +45,17 @@ Step 3. Add a setting to not show untracked files (I create no alias, as I assum
 Step 4. Put all the files stored in the repo, in their actual locations
 
     git --git-dir=$HOME/.repo --work-tree $HOME checkout
-Step 5. Close and open your shell window
+
+Step 5. Set upstream to push changes
+
+    git --git-dir=$HOME/.repo --work-tree $HOME push --set-upstream origin main
+    
+Step 6. Run the init script once and once only
+
+    .bin/repo-install.sh
+    
+Step 7. Close and open your shell window
+
 
 If things aren't working, please refer to the original blog post from which all this was derives for additional information and steps to take. 
+
