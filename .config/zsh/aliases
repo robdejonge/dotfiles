@@ -1,6 +1,5 @@
 ### COMMON ALIASES ###
 
-alias dh='ssh robdejonge@achebe.dreamhost.com'
 alias peel='ssh pi@peel.lan'
 alias pomelo='ssh rob@pomelo.lan'
 alias navel='ssh rob@navel.lan'
@@ -22,6 +21,7 @@ alias log-nginx='peel tail -f /opt/nginx/var/log/nginx/access.log'
 alias log-zigbee='kumquat tail -f /usr/share/zigbee-bridge/logs/zigbee2mqtt.log'
 alias esphome='yuzu docker -it exec esphome esphome'
 
+alias dps='docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}" -a' 
 
 alias grep='grep --color=auto'
 alias df='df -H'
