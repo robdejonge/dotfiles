@@ -52,7 +52,7 @@ Step 5. Set upstream to push changes
     
 Step 6. Run the init script once and once only
 
-    .bin/repo-install.sh
+    $HOME/.bin/repo-install.sh
     
 Step 7. Close and open your shell window
 
