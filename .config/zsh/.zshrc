@@ -44,6 +44,8 @@ case "$OSTYPE" in
 
 esac
 
+export PATH=${PATH}:$HOME/.bin
+
 # Use ctrl-l, ctrl-v to paste the output of the last command
 zmodload -i zsh/parameter
 insert-last-command-output() { 

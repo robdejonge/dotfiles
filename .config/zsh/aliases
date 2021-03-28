@@ -85,3 +85,4 @@ esac
 
 # this one is used for the dotfiles repo
 alias config='/usr/bin/git --git-dir=$HOME/.repo/ --work-tree=$HOME'
+alias reload-aliases='source $ZDOTDIR/aliases'
