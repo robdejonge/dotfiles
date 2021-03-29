@@ -57,9 +57,10 @@ man() {
 case "$OSTYPE" in 
 
   linux*)
-    alias lll='ls -alh --color=auto'
-    alias ll='ls -lh --color=auto'
-    alias l='ls --color=auto'
+    alias ls='ls --color=auto'
+    alias lll='ls -alh'
+    alias ll='ls -lh'
+    alias l='ls'
     alias rbn='sudo shutdown --reboot now'
     alias sdn='sudo shutdown --poweroff now'  
     ;;
