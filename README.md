@@ -7,7 +7,7 @@ Although many options exist, ranging from custom scripts to tools such as Stow, 
 - Uses the XDG Base Directory Specification, explicitly defining the default values to announce this
 - User-specific configuration files (.config) are only added to the repository if I edited them; why save defaults?
 
-## Initial setup
+### Initial setup
 
 I like using .repo as the directory in which the Git repo is stored. Again, this is a bare repo and so the work space (work tree) is my actual home directory. Follow these steps if you want to create your own version of a 'dot files' repository using a bare Git repo. If you want to use mine (no idea why you would), follow the steps below for a new machine. 
 
@@ -33,7 +33,7 @@ Step 6. Push your repository to your server of choice, if you want
     git remote add origin  <REMOTE_URL>
     git push -u origin main
     
-## Using on a new machine
+### Using on a new machine
 
 Step 1. Ignore the repository in any other reposities that might be there
 
