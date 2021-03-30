@@ -2,7 +2,7 @@
 
 Although many options exist, ranging from custom scripts to tools such as Stow, when looking for a solution I felt the bare Git repo was the most elegant of all available. The idea came from https://www.atlassian.com/git/tutorials/dotfiles, and a few instructions are outlined below. 
 
-## Guiding principles used for this repository
+### Guiding principles used for this repository
 
 - Uses the XDG Base Directory Specification, explicitly defining the default values to announce this
 - User-specific configuration files (.config) are only added to the repository if I edited them; why save defaults?
