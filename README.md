@@ -4,7 +4,7 @@ Although many options exist, ranging from custom scripts to tools such as Stow, 
     
 ## Using on a new machine
 
-Step 1. Ignore the repositoy in any other reposities that might be there
+Step 1. Ignore the repository in any other reposities that might be there
 
     echo ".repo" >> .gitignore
     
@@ -38,3 +38,7 @@ Step 8. Close and open your shell window
 
 If things aren't working, please refer to the original blog post from which all this was derives for additional information and steps to take. 
 
+## Guiding principles used for this repository
+
+- Uses the XDG Base Directory Specification, explicitly defining the default values to announce this
+- User-specific configuration files (.config) are only added to the repository if I edited them; why save defaults?
