@@ -1,0 +1,34 @@
+# path-related functions
+
+add-to-path () {
+
+  [ -d "$1" ] && export PATH=${PATH}:$1
+
+}
+
+deduplicate-path () { # call this from the end of your .zshrc
+
+  PATH=$(echo "$PATH" | awk -v RS=':' -v ORS=":" '!a[$1]++{if (NR > 1) printf ORS; printf $a[$1]}')
+
+}
+
+# add to path for specific operating systems
+
+case "$OSTYPE" in 
+
+  linux*)
+    add-to-path "/opt/local/bin"
+    ;;
+
+  darwin*)
+    add-to-path "${HOME}/Scripts"
+    ;;
+    
+  openbsd*)
+    ;;
+
+esac
+
+# add to path for all operating systems
+
+add-to-path "${HOME}/.bin"
