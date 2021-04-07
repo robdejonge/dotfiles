@@ -34,7 +34,7 @@ bindkey '\e\e[D' backward-word
 bindkey '\e\e[C' forward-word
 
 # Load my other files
-for file in path aliases functions prompt; do 
+for file in functions aliases path prompt; do 
 [ -f ${ZDOTDIR}/$file ] && source ${ZDOTDIR}/$file; done
 unset file
 

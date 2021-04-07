@@ -22,20 +22,6 @@ alias log-nginx='peel tail -f /opt/nginx/var/log/nginx/access.log'
 alias log-zigbee='kumquat tail -f /usr/share/zigbee-bridge/logs/zigbee2mqtt.log'
 alias esphome='yuzu docker -it exec esphome esphome'
 
-
-alias df='df -h'
-alias du='du -ch'
-
-alias epoch='date +"%s"'
-alias when='relative_string'
-
-# . and .. already exist, why not expand this?
-alias -g ...='../..'
-alias -g ....='../../..'
-alias -g .....='../../../..'
-
-mkcd() { mkdir $1; cd $1 }
-
 # colorized man pages
 man() {
   env \
@@ -56,39 +42,50 @@ case "$OSTYPE" in
 
   linux*)
     alias ls='ls --color=auto'
-    alias lll='ls -alh'
-    alias ll='ls -lh'
-    alias l='ls'
     alias grep='grep --color=auto'
     alias rbn='sudo shutdown --reboot now'
     alias sdn='sudo shutdown --poweroff now'
+
     alias apt-get='sudo apt-get'
     alias apt='sudo apt'
     alias dps='docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}" -a' 
     ;;
 
   darwin*)
-    alias lll='ls -alGh'
-    alias ll='ls -lGh'
-    alias l='ls -Gh'
+    alias ls='ls -G'
     alias grep='grep --color=auto'
-    alias f='open -a "Finder"'
-    alias code='open -a "Visual Studio Code"'
     alias rbn='sudo shutdown -h now'
     alias sdn='sudo shutdown -r now'
+
+    alias f='open -a "Finder"'
+    alias code='open -a "Visual Studio Code"'
     alias flushdns='dscacheutil -flushcache'
     ;;
     
   openbsd*)
     unset -f man 
-    alias lll='ls -alh'
-    alias ll='ls -lh'
-    alias l='ls -h'
     alias rbn='doas shutdown -r now'
     alias sdn='doas shutdown -p now'
     ;;
 
 esac
+
+alias lll='ls -alh'
+alias ll='ls -lh'
+alias l='ls'
+
+alias df='df -h'
+alias du='du -ch'
+
+alias epoch='date +"%s"'
+alias when='relative_string'
+
+# . and .. already exist, why not expand this?
+alias -g ...='../..'
+alias -g ....='../../..'
+alias -g .....='../../../..'
+
+mkcd() { mkdir $1; cd $1 }
 
 # this one is used for the dotfiles repo
 alias config='git --git-dir=$HOME/.repo/ --work-tree=$HOME'
