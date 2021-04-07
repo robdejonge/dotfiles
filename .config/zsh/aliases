@@ -1,6 +1,7 @@
 ### COMMON ALIASES ###
 
 alias peel='ssh pi@peel.lan'
+alias pompia='ssh rob@pompia.lan'
 alias pomelo='ssh rob@pomelo.lan'
 alias navel='ssh rob@navel.lan'
 alias yuzu='ssh rob@yuzu.lan'
@@ -21,12 +22,9 @@ alias log-nginx='peel tail -f /opt/nginx/var/log/nginx/access.log'
 alias log-zigbee='kumquat tail -f /usr/share/zigbee-bridge/logs/zigbee2mqtt.log'
 alias esphome='yuzu docker -it exec esphome esphome'
 
-alias dps='docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}" -a' 
 
-alias grep='grep --color=auto'
-alias df='df -H'
+alias df='df -h'
 alias du='du -ch'
-alias apt-get='sudo apt-get'
 
 alias epoch='date +"%s"'
 alias when='relative_string'
@@ -40,16 +38,16 @@ mkcd() { mkdir $1; cd $1 }
 
 # colorized man pages
 man() {
-	env \
-		LESS_TERMCAP_md=$(tput bold; tput setaf 4) \
-		LESS_TERMCAP_me=$(tput sgr0) \
-		LESS_TERMCAP_mb=$(tput blink) \
-		LESS_TERMCAP_us=$(tput setaf 2) \
-		LESS_TERMCAP_ue=$(tput sgr0) \
-		LESS_TERMCAP_so=$(tput smso) \
-		LESS_TERMCAP_se=$(tput rmso) \
-		PAGER="${commands[less]:-$PAGER}" \
-		man "$@"
+  env \
+    LESS_TERMCAP_md=$(tput bold; tput setaf 4) \
+    LESS_TERMCAP_me=$(tput sgr0) \
+    LESS_TERMCAP_mb=$(tput blink) \
+    LESS_TERMCAP_us=$(tput setaf 2) \
+    LESS_TERMCAP_ue=$(tput sgr0) \
+    LESS_TERMCAP_so=$(tput smso) \
+    LESS_TERMCAP_se=$(tput rmso) \
+    PAGER="${commands[less]:-$PAGER}" \
+    man "$@"
 }
 
 ### OS-SPECIFIC ALIASES ###
@@ -61,14 +59,19 @@ case "$OSTYPE" in
     alias lll='ls -alh'
     alias ll='ls -lh'
     alias l='ls'
+    alias grep='grep --color=auto'
     alias rbn='sudo shutdown --reboot now'
-    alias sdn='sudo shutdown --poweroff now'  
+    alias sdn='sudo shutdown --poweroff now'
+    alias apt-get='sudo apt-get'
+    alias apt='sudo apt'
+    alias dps='docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}" -a' 
     ;;
 
   darwin*)
     alias lll='ls -alGh'
     alias ll='ls -lGh'
     alias l='ls -Gh'
+    alias grep='grep --color=auto'
     alias f='open -a "Finder"'
     alias code='open -a "Visual Studio Code"'
     alias rbn='sudo shutdown -h now'
@@ -77,13 +80,16 @@ case "$OSTYPE" in
     ;;
     
   openbsd*)
+    unset -f man 
     alias lll='ls -alh'
     alias ll='ls -lh'
     alias l='ls -h'
+    alias rbn='doas shutdown -r now'
+    alias sdn='doas shutdown -p now'
     ;;
 
 esac
 
 # this one is used for the dotfiles repo
-alias config='/usr/bin/git --git-dir=$HOME/.repo/ --work-tree=$HOME'
+alias config='git --git-dir=$HOME/.repo/ --work-tree=$HOME'
 alias reload-aliases='source $ZDOTDIR/aliases'
