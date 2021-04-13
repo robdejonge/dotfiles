@@ -67,6 +67,7 @@ case "$OSTYPE" in
     alias sudo='doas' 
     alias rbn='doas shutdown -r now'
     alias sdn='doas shutdown -p now'
+    alias watch='gnuwatch'
     ;;
 
 esac
