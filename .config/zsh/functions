@@ -1,4 +1,24 @@
 
+
+# git wrapper for the bare dotfiles repo
+dotfiles() { git --git-dir="$HOME/.dotfiles" --work-tree="$HOME" "$@"; }
+
+# Commit all changes to tracked dotfiles and push. Usage: dotfiles-push <message>
+dotfiles-push() {
+    if [ -z "$1" ]; then
+        echo "usage: dotfiles-push <commit message>" >&2
+        return 1
+    fi
+    if dotfiles diff --quiet && dotfiles diff --cached --quiet; then
+        echo "dotfiles: nothing to commit"
+    else
+        dotfiles commit -a -m "$1" || return
+    fi
+    dotfiles push
+}
+
+mkcd() { mkdir $1; cd $1 }
+
 function sornot () {
 
   local count=$1

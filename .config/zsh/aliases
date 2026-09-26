@@ -22,6 +22,13 @@ alias log-nginx='peel tail -f /opt/nginx/var/log/nginx/access.log'
 alias log-zigbee='kumquat tail -f /usr/share/zigbee-bridge/logs/zigbee2mqtt.log'
 alias esphome='yuzu docker -it exec esphome esphome'
 
+# Show what would be committed
+alias dotfiles-status='dotfiles status -sb'
+
+# Pull changes made on another machine
+alias dotfiles-pull='dotfiles pull --ff-only'
+
+
 # colorized man pages
 man() {
   env \
@@ -87,9 +94,6 @@ alias -g ...='../..'
 alias -g ....='../../..'
 alias -g .....='../../../..'
 
-mkcd() { mkdir $1; cd $1 }
-
 # this one is used for the dotfiles repo
-alias dotfiles='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 alias dot='dotfiles' 
 alias reload-aliases='source $ZDOTDIR/aliases'
