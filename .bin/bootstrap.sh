@@ -5,8 +5,8 @@ set -e
 REPO_HTTPS="https://github.com/robdejonge/dotfiles.git"
 REPO_SSH="git@github.com:robdejonge/dotfiles.git"
 BRANCH="${DOTFILES_BRANCH:-main}"
-DIR="$HOME/.repo"
-BACKUP="$HOME/.repo-backup"
+DIR="$HOME/.dotfiles"
+BACKUP="$HOME/.original-dotfiles-backup"
 
 config() { git --git-dir="$DIR" --work-tree="$HOME" "$@"; }
 
@@ -41,9 +41,17 @@ config config branch."$BRANCH".remote origin
 config config branch."$BRANCH".merge refs/heads/"$BRANCH"
 config remote set-url --push origin "$REPO_SSH"
 
-# Create XDG directories
+# Create runtime directories and files expected by the dotfiles
 . "$HOME/.config/zsh/environment"
-sh "$HOME/.bin/repo-install.sh"
+for d in \
+    "$XDG_CACHE_HOME/zsh" \
+    "$XDG_CACHE_HOME/vim/undodir" \
+    "$XDG_CACHE_HOME/less" \
+    "$XDG_DATA_HOME/mail"
+do
+    mkdir -p "$d"
+done
+touch "$XDG_CACHE_HOME/zsh/history" "$XDG_DATA_HOME/mail/mbox"
 
 # Report legacy shell files that zsh with ZDOTDIR will never read
 found=""
@@ -76,9 +84,17 @@ fi
 echo
 
 
-echo "Dotfiles installed from branch '$BRANCH'. Start a new login shell."
+echo "-> Dotfiles installed from branch '$BRANCH'. Start a new login shell."
+
+if [ ! -f "$HOME/.ssh/id_ed25519.pub" ]; then
+    echo 
+    echo "-> No SSH key found. To push changes from this machine:"
+    echo "     ssh-keygen -t ed25519 -C \"\$(hostname)\""
+    echo "     cat ~/.ssh/id_ed25519.pub   # add at https://github.com/settings/keys"
+fi
 
 if [ -n "$(ls -A "$BACKUP" 2>/dev/null)" ]; then
-    echo "Backed-up files are in $BACKUP - inspect, then remove that directory."
+    echo
+    echo "-> Backed-up files are in $BACKUP - inspect, then remove that directory."
 fi
 

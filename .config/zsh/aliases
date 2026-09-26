@@ -90,5 +90,5 @@ alias -g .....='../../../..'
 mkcd() { mkdir $1; cd $1 }
 
 # this one is used for the dotfiles repo
-alias config='git --git-dir=$HOME/.repo/ --work-tree=$HOME'
+alias config='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 alias reload-aliases='source $ZDOTDIR/aliases'
