@@ -45,4 +45,40 @@ config remote set-url --push origin "$REPO_SSH"
 . "$HOME/.config/zsh/environment"
 sh "$HOME/.bin/repo-install.sh"
 
+# Report legacy shell files that zsh with ZDOTDIR will never read
+found=""
+for f in .profile .bash_profile .bash_login .bash_logout .bashrc .zshrc .zprofile .zlogin .zlogout; do
+    [ -f "$HOME/$f" ] && found="$found $f"
+done
+
+if [ -n "$found" ]; then
+    echo
+    echo "Pre-existing shell files not managed by the repo:"
+    for f in $found; do
+        printf '  %-16s %s\n' "$f" "$(wc -l < "$HOME/$f") lines"
+    done
+    echo "They will not be read by zsh with ZDOTDIR set. Check them for host-specific"
+    echo "settings (PATH, proxies, tokens) before removing."
+    if [ -t 0 ] && [ -z "$DOTFILES_NONINTERACTIVE" ]; then
+        printf 'Move them to %s? [y/N] ' "$BACKUP"
+        read -r answer
+        case "$answer" in
+            y|Y)
+                mkdir -p "$BACKUP"
+                for f in $found; do mv "$HOME/$f" "$BACKUP/$f"; done
+                echo "Moved. Review with: less $BACKUP/*"
+                ;;
+            *) echo "Left in place." ;;
+        esac
+    fi
+fi
+
+echo
+
+
 echo "Dotfiles installed from branch '$BRANCH'. Start a new login shell."
+
+if [ -n "$(ls -A "$BACKUP" 2>/dev/null)" ]; then
+    echo "Backed-up files are in $BACKUP - inspect, then remove that directory."
+fi
+
