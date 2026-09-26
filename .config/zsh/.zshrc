@@ -40,3 +40,6 @@ unset file
 
 # Cleanup
 deduplicate-path
+
+# Check if dotfiles need updating
+dotfiles-check

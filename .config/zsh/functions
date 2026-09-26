@@ -17,6 +17,21 @@ dotfiles-push() {
     dotfiles push
 }
 
+# in functions
+dotfiles-check() {
+    local cache="$XDG_CACHE_HOME/dotfiles/last-check"
+    local interval=86400   # seconds; 24h
+    if [ -f "$cache" ] && [ "$(($(date +%s) - $(stat -c %Y "$cache")))" -lt "$interval" ]; then
+        return
+    fi
+    mkdir -p "$(dirname "$cache")"
+    touch "$cache"
+    dotfiles fetch --quiet 2>/dev/null || return
+    if ! dotfiles diff --quiet main origin/main; then
+        echo "dotfiles: updates available — run 'dotfiles-pull'"
+    fi
+}
+
 mkcd() { mkdir $1; cd $1 }
 
 function sornot () {
