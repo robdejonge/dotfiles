@@ -36,7 +36,7 @@ dotfiles update-index --assume-unchanged README.md
 rm -f "$HOME/README.md"
 
 # Tracking + push over SSH (no key needed for the clone itself)
-dotfiles remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
+dotfiles config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
 dotfiles config branch."$BRANCH".remote origin
 dotfiles config branch."$BRANCH".merge refs/heads/"$BRANCH"
 dotfiles remote set-url --push origin "$REPO_SSH"
