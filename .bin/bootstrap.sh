@@ -1,5 +1,6 @@
 #!/bin/sh
 # Usage: sh -c "$(curl -fsSL https://raw.githubusercontent.com/robdejonge/dotfiles/main/.bin/bootstrap.sh)"
+# https://github.com/robdejonge/dotfiles/
 set -e
 
 REPO_HTTPS="https://github.com/robdejonge/dotfiles.git"
