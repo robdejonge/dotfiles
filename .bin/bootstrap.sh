@@ -8,7 +8,7 @@ BRANCH="${DOTFILES_BRANCH:-main}"
 DIR="$HOME/.dotfiles"
 BACKUP="$HOME/.original-dotfiles-backup"
 
-config() { git --git-dir="$DIR" --work-tree="$HOME" "$@"; }
+dotfiles() { git --git-dir="$DIR" --work-tree="$HOME" "$@"; }
 
 cd "$HOME"
 
@@ -18,28 +18,28 @@ if [ -e "$DIR" ]; then
 fi
 
 git clone --quiet --bare --branch "$BRANCH" "$REPO_HTTPS" "$DIR"
-config config --local status.showUntrackedFiles no
+dotfiles config --local status.showUntrackedFiles no
 
 # Move aside anything checkout would overwrite
-if ! config checkout 2>/dev/null; then
+if ! dotfiles checkout 2>/dev/null; then
     mkdir -p "$BACKUP"
-    config checkout 2>&1 | grep -E '^[[:space:]]+' | awk '{print $1}' | while read -r f; do
+    dotfiles checkout 2>&1 | grep -E '^[[:space:]]+' | awk '{print $1}' | while read -r f; do
         mkdir -p "$BACKUP/$(dirname "$f")"
         mv "$HOME/$f" "$BACKUP/$f"
         echo "moved existing $f to $BACKUP/$f"
     done
-    config checkout
+    dotfiles checkout
 fi
 
 # README belongs on GitHub, not in $HOME
-config update-index --assume-unchanged README.md
+dotfiles update-index --assume-unchanged README.md
 rm -f "$HOME/README.md"
 
 # Tracking + push over SSH (no key needed for the clone itself)
-config config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
-config config branch."$BRANCH".remote origin
-config config branch."$BRANCH".merge refs/heads/"$BRANCH"
-config remote set-url --push origin "$REPO_SSH"
+dotfiles remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
+dotfiles config branch."$BRANCH".remote origin
+dotfiles config branch."$BRANCH".merge refs/heads/"$BRANCH"
+dotfiles remote set-url --push origin "$REPO_SSH"
 
 # Create runtime directories and files expected by the dotfiles
 . "$HOME/.config/zsh/environment"
