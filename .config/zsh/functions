@@ -17,15 +17,23 @@ dotfiles-push() {
     dotfiles push
 }
 
-# in functions
+# Check if local changes should be pushed or remote changes should be pulled
 dotfiles-check() {
     local cache="$XDG_CACHE_HOME/dotfiles/last-check"
-    local interval=86400   # seconds; 24h
+    local interval=86400
     if [ -f "$cache" ] && [ "$(($(date +%s) - $(stat -c %Y "$cache")))" -lt "$interval" ]; then
         return
     fi
     mkdir -p "$(dirname "$cache")"
     touch "$cache"
+
+    # local: unpushed commits?
+    if ! dotfiles diff --quiet main origin/main 2>/dev/null; then
+        echo "dotfiles: local changes not pushed — run 'dotfiles-push'"
+        return
+    fi
+
+    # network: upstream ahead?
     dotfiles fetch --quiet 2>/dev/null || return
     if ! dotfiles diff --quiet main origin/main; then
         echo "dotfiles: updates available — run 'dotfiles-pull'"

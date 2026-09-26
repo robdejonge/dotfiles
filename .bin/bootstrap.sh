@@ -9,6 +9,20 @@ BRANCH="${DOTFILES_BRANCH:-main}"
 DIR="$HOME/.dotfiles"
 BACKUP="$HOME/.original-dotfiles-backup"
 
+# Hard dependencies: fail fast if either is missing
+missing=""
+pkgs=""
+command -v git >/dev/null 2>&1 || { missing="$missing git"; pkgs="$pkgs git"; }
+command -v zsh >/dev/null 2>&1 || { missing="$missing zsh"; pkgs="$pkgs zsh"; }
+
+if [ -n "$missing" ]; then
+    echo "ERROR: missing required tools:$missing" >&2
+    echo "  Debian/Ubuntu: sudo apt-get install -y$pkgs" >&2
+    echo "  FreeBSD:       sudo pkg install -y$pkgs" >&2
+    echo "  macOS:         git: xcode-select --install ; zsh: preinstalled" >&2
+    exit 1
+fi
+
 dotfiles() { git --git-dir="$DIR" --work-tree="$HOME" "$@"; }
 
 cd "$HOME"
@@ -98,6 +112,14 @@ if [ -n "$(ls -A "$BACKUP" 2>/dev/null)" ]; then
     echo
     echo "-> Backed-up files are in $BACKUP - inspect, then remove that directory."
 fi
+
+# Helpful warning only: zsh is installed but not the default shell
+case "$SHELL" in
+    */zsh) : ;;
+    *) echo 
+       echo "-> Note: default shell is $SHELL, not zsh. To change:"
+       echo "     chsh -s $(command -v zsh)" ;;
+esac
 
 echo 
 echo "-> Start a new login shell to effect changes." 
