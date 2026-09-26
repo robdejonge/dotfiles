@@ -1,0 +1,7 @@
+[user]
+	name = Rob de Jonge
+	email = 801654+robdejonge@users.noreply.github.com
+[init]
+	defaultBranch = main
+[pull]
+	rebase = false

@@ -84,12 +84,12 @@ fi
 echo
 
 
-echo "-> Dotfiles installed from branch '$BRANCH'. Start a new login shell."
+echo "-> Dotfiles installed from branch '$BRANCH'. "
 
 if [ ! -f "$HOME/.ssh/id_ed25519.pub" ]; then
     echo 
     echo "-> No SSH key found. To push changes from this machine:"
-    echo "     ssh-keygen -t ed25519 -C \"\$(hostname)\""
+    echo "     ssh-keygen -q -t ed25519 -N '' -f ~/.ssh/id_ed25519 -C \"\$(hostname)\""
     echo "     cat ~/.ssh/id_ed25519.pub   # add at https://github.com/settings/keys"
 fi
 
@@ -98,3 +98,5 @@ if [ -n "$(ls -A "$BACKUP" 2>/dev/null)" ]; then
     echo "-> Backed-up files are in $BACKUP - inspect, then remove that directory."
 fi
 
+echo 
+echo "-> Start a new login shell to effect changes." 
