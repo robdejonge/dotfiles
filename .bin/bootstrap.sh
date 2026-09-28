@@ -65,7 +65,7 @@ if ! dotfiles checkout 2>/dev/null; then
     dotfiles checkout 2>&1 | grep -E '^[[:space:]]+' | awk '{print $1}' | while read -r f; do
         mkdir -p "$BACKUP/$(dirname "$f")"
         mv "$HOME/$f" "$BACKUP/$f"
-        echo "moved existing $f to $BACKUP/$f"
+        echo "  - Moved existing $f to $BACKUP/$f"
     done
     dotfiles checkout
 else 
