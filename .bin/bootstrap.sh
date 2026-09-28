@@ -1,13 +1,18 @@
 #!/bin/sh
-# Usage: sh -c "$(curl -fsSL https://raw.githubusercontent.com/robdejonge/dotfiles/main/.bin/bootstrap.sh)"
+#
+# Usage: 
+# sh -c "$(curl -fsSL "https://raw.githubusercontent.com/robdejonge/dotfiles/main/.bin/bootstrap.sh?$(date +%s)")"
+#
+# Source:
 # https://github.com/robdejonge/dotfiles/
-set -e
 
-REPO_HTTPS="https://github.com/robdejonge/dotfiles.git"
-REPO_SSH="git@github.com:robdejonge/dotfiles.git"
+GHUSERNAME="robdejonge"
+GHREPONAME="dotfiles"
+REPO_HTTPS="https://github.com/${GHUSERNAME}/${GHREPONAME}.git"
+REPO_SSH="git@github.com:${GHUSERNAME}/${GHREPONAME}.git"
 BRANCH="${DOTFILES_BRANCH:-main}"
-DIR="$HOME/.dotfiles"
-BACKUP="$HOME/.original-dotfiles-backup"
+DIR="$HOME/.${GHREPONAME}"
+BACKUP="$HOME/.original-${GHREPONAME}-backup-$(date +%Y%m%d-%H%M%S)"
 
 # Hard dependencies: fail fast if either is missing
 missing=""
@@ -57,7 +62,11 @@ dotfiles config branch."$BRANCH".merge refs/heads/"$BRANCH"
 dotfiles remote set-url --push origin "$REPO_SSH"
 
 # Create runtime directories and files expected by the dotfiles
-. "$HOME/.config/zsh/environment"
+
+if [ -r "$HOME/.config/zsh/environment" ]; then
+    . "$HOME/.config/zsh/environment"
+fi
+
 for d in \
     "$XDG_CACHE_HOME/zsh" \
     "$XDG_CACHE_HOME/vim/undodir" \
@@ -105,7 +114,7 @@ if [ ! -f "$HOME/.ssh/id_ed25519.pub" ]; then
     echo 
     echo "-> No SSH key found. To push changes from this machine:"
     echo "     ssh-keygen -q -t ed25519 -N '' -f ~/.ssh/id_ed25519 -C \"\$(hostname)\""
-    echo "     cat ~/.ssh/id_ed25519.pub   # add at https://github.com/settings/keys"
+    echo "     cat ~/.ssh/id_ed25519.pub   # https://github.com/${GHUSERNAME}/${GHREPONAME}/settings/keys/new"
 fi
 
 if [ -n "$(ls -A "$BACKUP" 2>/dev/null)" ]; then
