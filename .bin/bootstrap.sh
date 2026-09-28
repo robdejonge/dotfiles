@@ -6,21 +6,28 @@
 # Source:
 # https://github.com/robdejonge/dotfiles/
 
+# Change these if you fork this repo 
 GHUSERNAME="robdejonge"
 GHREPONAME="dotfiles"
+
 REPO_HTTPS="https://github.com/${GHUSERNAME}/${GHREPONAME}.git"
 REPO_SSH="git@github.com:${GHUSERNAME}/${GHREPONAME}.git"
 BRANCH="${DOTFILES_BRANCH:-main}"
 DIR="$HOME/.${GHREPONAME}"
 BACKUP="$HOME/.original-${GHREPONAME}-backup-$(date +%Y%m%d-%H%M%S)"
 
+echo "Starting dotfiles setup...."
+
+
 # Hard dependencies: fail fast if either is missing
+echo -n "Checking dependencies..."
 missing=""
 pkgs=""
 command -v git >/dev/null 2>&1 || { missing="$missing git"; pkgs="$pkgs git"; }
 command -v zsh >/dev/null 2>&1 || { missing="$missing zsh"; pkgs="$pkgs zsh"; }
 
 if [ -n "$missing" ]; then
+    echo "failed"
     echo "ERROR: missing required tools:$missing" >&2
     echo "  Debian/Ubuntu: sudo apt-get install -y$pkgs" >&2
     echo "  FreeBSD:       sudo pkg install -y$pkgs" >&2
@@ -28,19 +35,30 @@ if [ -n "$missing" ]; then
     exit 1
 fi
 
+echo "ok"
+
+# Do not overwrite an existing install
+echo -n "Checking for existing install..."
+
 dotfiles() { git --git-dir="$DIR" --work-tree="$HOME" "$@"; }
 
 cd "$HOME"
 
 if [ -e "$DIR" ]; then
-    echo "$DIR already exists; refusing to continue." >&2
+    echo "failed" 
+    echo "ERROR: $DIR already exists; refusing to continue." >&2
     exit 1
 fi
 
+echo "ok" 
+
+# Downloading repo
+echo "Attempting to clone ${REPO_HTTPS}"
 git clone --quiet --bare --branch "$BRANCH" "$REPO_HTTPS" "$DIR"
 dotfiles config --local status.showUntrackedFiles no
 
 # Move aside anything checkout would overwrite
+echo "Handling prior shell config files" 
 if ! dotfiles checkout 2>/dev/null; then
     mkdir -p "$BACKUP"
     dotfiles checkout 2>&1 | grep -E '^[[:space:]]+' | awk '{print $1}' | while read -r f; do
@@ -52,16 +70,19 @@ if ! dotfiles checkout 2>/dev/null; then
 fi
 
 # README belongs on GitHub, not in $HOME
+echo "Dealing with README" 
 dotfiles update-index --assume-unchanged README.md
 rm -f "$HOME/README.md"
 
 # Tracking + push over SSH (no key needed for the clone itself)
+echo "Configuring git for this repo" 
 dotfiles config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
 dotfiles config branch."$BRANCH".remote origin
 dotfiles config branch."$BRANCH".merge refs/heads/"$BRANCH"
 dotfiles remote set-url --push origin "$REPO_SSH"
 
 # Create runtime directories and files expected by the dotfiles
+echo "Create runtime directories and files expected"
 
 if [ -r "$HOME/.config/zsh/environment" ]; then
     . "$HOME/.config/zsh/environment"
@@ -75,9 +96,11 @@ for d in \
 do
     mkdir -p "$d"
 done
+
 touch "$XDG_CACHE_HOME/zsh/history" "$XDG_DATA_HOME/mail/mbox"
 
 # Report legacy shell files that zsh with ZDOTDIR will never read
+echo "Handling prior shell config files"
 found=""
 for f in .profile .bash_profile .bash_login .bash_logout .bashrc .zshrc .zprofile .zlogin .zlogout; do
     [ -f "$HOME/$f" ] && found="$found $f"
