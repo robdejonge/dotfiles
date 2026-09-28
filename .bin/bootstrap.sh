@@ -50,16 +50,17 @@ if [ -e "$DIR" ]; then
     exit 1
 fi
 
-echo "ok" 
+echo "not found, proceeding" 
 
 # Downloading repo
-echo "> Attempting to clone ${REPO_HTTPS}"
+echo "> Cloning ${REPO_HTTPS}"
 git clone --quiet --bare --branch "$BRANCH" "$REPO_HTTPS" "$DIR"
 dotfiles config --local status.showUntrackedFiles no
 
 # Move aside anything checkout would overwrite
-echo "> Handling prior shell config files" 
+echo -n "> Checking for conflicts..."
 if ! dotfiles checkout 2>/dev/null; then
+    echo "conflict detected"
     mkdir -p "$BACKUP"
     dotfiles checkout 2>&1 | grep -E '^[[:space:]]+' | awk '{print $1}' | while read -r f; do
         mkdir -p "$BACKUP/$(dirname "$f")"
@@ -67,6 +68,8 @@ if ! dotfiles checkout 2>/dev/null; then
         echo "moved existing $f to $BACKUP/$f"
     done
     dotfiles checkout
+else 
+    echo "none found"
 fi
 
 # README belongs on GitHub, not in $HOME
@@ -116,6 +119,7 @@ if [ -n "$found" ]; then
     for f in $found; do
         printf '  - %-16s %s\n' "$f" "$(wc -l < "$HOME/$f") lines"
     done
+    echo ""
     echo "  These files are not part of and not managed by this repo. They will not be"
     echo "  read by zsh with ZDOTDIT set. Check them for host-specific settings such"
     echo "  as path, proxies, tokens, before removing." 
@@ -143,7 +147,7 @@ fi
 echo -n "> Confirming an SSH key exists..."
 if [ ! -f "$HOME/.ssh/id_ed25519.pub" ]; then
     echo "no"
-    echo "  If you plan To push changes from this machine, do the following:"
+    echo "  If you plan to push changes from this machine, do the following:"
     echo "  - ssh-keygen -q -t ed25519 -N '' -f ~/.ssh/id_ed25519 -C \"\$(hostname)\""
     echo "  - cat ~/.ssh/id_ed25519.pub"
     echo "  - Add at https://github.com/${GHUSERNAME}/${GHREPONAME}/settings/keys/new"
