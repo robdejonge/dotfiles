@@ -10,6 +10,21 @@ export VISUAL=vi
 # zsh
 export ZDOTDIR=$XDG_CONFIG_HOME/zsh
 
+# Default to an installed UTF-8 locale when none is set (interactive shells only)
+if [[ -o interactive ]]; then
+  case "${LC_ALL:-${LC_CTYPE:-${LANG:-}}}" in
+    ""|C|POSIX)
+      _loc=$(locale -a 2>/dev/null | grep -iE '^en_US\.utf-?8$' | head -n1)
+      [[ -z $_loc ]] && _loc=$(locale -a 2>/dev/null | grep -iE '^C\.utf-?8$' | head -n1)
+      if [[ -n $_loc ]]; then
+        export LANG=$_loc
+        unset LC_ALL LC_CTYPE   # these would override LANG
+      fi
+      unset _loc
+      ;;
+  esac
+fi
+
 export MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc"
 export VIMINIT="source $XDG_CONFIG_HOME/vim/vimrc"
 export VIMDOTDIR="$XDG_CONFIG_HOME/vim"

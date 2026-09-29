@@ -50,7 +50,8 @@ add-zsh-hook preexec set_terminal_title_preexec
 add-zsh-hook precmd set_terminal_title_precmd
 
 # Load my other files
-for file in functions aliases path prompt; do 
+# path and environment files are loaded in .zshenv
+for file in functions aliases prompt; do 
 [ -f ${ZDOTDIR}/$file ] && source ${ZDOTDIR}/$file; done
 unset file
 

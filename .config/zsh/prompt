@@ -17,10 +17,10 @@ else
 fi
 
 case "$(uname -s)" in                  # start prompt with operating system logo
-  Linux*)   LOGO=$'\xf0\x9f\x90\xa7' ;;  # U+1F427
-  Darwin*)  LOGO=$'\xef\xa3\xbf'     ;;  # U+F8FF
-  FreeBSD*) LOGO=$'\xf0\x9f\x98\x88' ;;  # U+1F608
-  OpenBSD*) LOGO=$'\xf0\x9f\x90\xa1' ;;  # U+1F421
+  Linux*)   LOGO=$'\xf0\x9f\x90\xa7 ' ;;  # U+1F427
+  Darwin*)  LOGO=$'\xef\xa3\xbf '     ;;  # U+F8FF
+  FreeBSD*) LOGO=$'\xf0\x9f\x98\x88 ' ;;  # U+1F608
+  OpenBSD*) LOGO=$'\xf0\x9f\x90\xa1 ' ;;  # U+1F421
   *)        LOGO="" ;;
 esac
 
