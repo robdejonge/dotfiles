@@ -36,7 +36,6 @@ esac
 
 # add to path for all operating systems
 
-add-to-path "${HOME}/.bin"
 add-to-path "${HOME}/.local/bin"
 add-to-path "/opt/local/bin"
 add-to-path "/opt/local/sbin"

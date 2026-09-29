@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # Usage: 
-# sh -c "$(curl -fsSL "https://raw.githubusercontent.com/robdejonge/dotfiles/main/.bin/bootstrap.sh?$(date +%s)")"
+# sh -c "$(curl -fsSL "https://raw.githubusercontent.com/robdejonge/dotfiles/main/.local/bin/bootstrap.sh?$(date +%s)")"
 #
 # Source:
 # https://github.com/robdejonge/dotfiles/
@@ -80,6 +80,7 @@ rm -f "$HOME/README.md"
 # Tracking + push over SSH (no key needed for the clone itself)
 echo "> Configuring git for this repo" 
 dotfiles config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
+dotfiles fetch origin
 dotfiles config branch."$BRANCH".remote origin
 dotfiles config branch."$BRANCH".merge refs/heads/"$BRANCH"
 dotfiles remote set-url --push origin "$REPO_SSH"
