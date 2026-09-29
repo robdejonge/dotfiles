@@ -10,6 +10,7 @@ export VISUAL=vi
 # zsh
 export ZDOTDIR=$XDG_CONFIG_HOME/zsh
 
+export MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc"
 export VIMINIT="source $XDG_CONFIG_HOME/vim/vimrc"
 export VIMDOTDIR="$XDG_CONFIG_HOME/vim"
 export LESSHISTFILE=$XDG_CACHE_HOME/less/history
@@ -17,19 +18,33 @@ export LESSHISTFILE=$XDG_CACHE_HOME/less/history
 export MAILRC=$XDG_CONFIG_HOME/mail/mailrc
 export MBOX=$XDG_DATA_HOME/mail/mbox
 
-case "$OSTYPE" in 
+export DOCKER_CONFIG="$XDG_CONFIG_HOME/docker"
+export npm_config_userconfig="$XDG_CONFIG_HOME/npm"
+export npm_config_cache="$XDG_CACHE_HOME/npn"
+export PLATFORMIO_CORE_DIR="$XDG_CONFIG_HOME/platformio"
+export PLATFORMIO_CACHE_DIR="$XDG_CACHE_HOME/platformio"
+export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
+export CARGO_HOME="$XDG_DATA_HOME/cargo"
+export PYTHON_HISTORY=~/.local/share/python/history
+case "$(uname -s)" in 
 
-  linux*)
+  Linux*)
     export SYSLOG=/var/log/syslog
     ;;
 
-  darwin*)
+  Darwin*)
     export SYSLOG=/var/log/system.log 
     export INBOX=${HOME}/Desktop/Inbox
     export OUTBOX=${HOME}/Desktop/Outbox
+    export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
+    export HOMEBREW_NO_ENV_HINTS=1
+    export HOMEBREW_NO_AUTO_UPDATE=1
+    ;;
+
+  FreeBSD*) 
     ;;
     
-  openbsd*)
+  OpenBSD*)
     export SYSLOG=/var/log/messages
     ;;
 
