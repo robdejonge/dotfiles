@@ -17,28 +17,38 @@ dotfiles-push() {
     dotfiles push
 }
 
-# Check if local changes should be pushed or remote changes should be pulled
-dotfiles-check() {
-    local cache="$XDG_CACHE_HOME/dotfiles/last-check"
-    local interval=86400
-    if [ -f "$cache" ] && [ "$(($(date +%s) - $(stat -c %Y "$cache")))" -lt "$interval" ]; then
-        return
-    fi
-    mkdir -p "$(dirname "$cache")"
-    touch "$cache"
+dotfiles-check () {
+	local cache="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles/last-check" 
+	local interval=86400 
+	local last_mtime=0
 
-    # local: unpushed commits?
-    if ! dotfiles diff --quiet main origin/main 2>/dev/null; then
-        echo "dotfiles: local changes not pushed — run 'dotfiles-push'"
-        return
-    fi
+	# Portable stat mtime lookup (Linux vs BSD/macOS)
+	if [ -f "$cache" ]; then
+		last_mtime=$(stat -c %Y "$cache" 2>/dev/null || stat -f %m "$cache" 2>/dev/null || echo 0)
+		if [ "$(( $(date +%s) - last_mtime ))" -lt "$interval" ]; then
+			return
+		fi
+	fi
 
-    # network: upstream ahead?
-    dotfiles fetch --quiet 2>/dev/null || return
-    if ! dotfiles diff --quiet main origin/main; then
-        echo "dotfiles: updates available — run 'dotfiles-pull'"
-    fi
+	mkdir -p "$(dirname "$cache")"
+	touch "$cache"
+
+	# Fetch latest remote references
+	dotfiles fetch --quiet 2>/dev/null || return
+
+	# Count commits local is ahead/behind origin
+	local ahead behind
+	ahead=$(dotfiles rev-list --count origin/main..main 2>/dev/null)
+	behind=$(dotfiles rev-list --count main..origin/main 2>/dev/null)
+
+	if [ "${ahead:-0}" -gt 0 ]; then
+		echo "dotfiles: local changes not pushed — run 'dotfiles-push'"
+	elif [ "${behind:-0}" -gt 0 ]; then
+		echo "dotfiles: updates available — run 'dotfiles-pull'"
+	fi
 }
+
+
 
 mkcd() { mkdir $1; cd $1 }
 
