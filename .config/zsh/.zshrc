@@ -11,6 +11,9 @@ export HISTSIZE=10000000
 export SAVEHIST=10000000
 
 # Autocomplete bits
+if type brew &>/dev/null; then
+  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+fi
 autoload -U compinit
 zstyle ':completion:*' menu select
 zmodload zsh/complist
