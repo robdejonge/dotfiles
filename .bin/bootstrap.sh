@@ -107,6 +107,7 @@ echo "> Dotfiles setup complete"
 
 
 # Report legacy shell files that zsh with ZDOTDIR will never read
+echo " "
 echo -n "> Looking for existing shell configuration files..." 
 
 found=""
@@ -143,10 +144,16 @@ else
     echo "not found" 
 fi
 
-# Deal with the ssh situation 
-echo -n "> Confirming an SSH key exists..."
+# Suggest a client ssh, for easy access
+echo " "
+echo "> Consider installing a client SSH key for easy access to this shell:"
+echo "  - ssh-copy-id $(id -un)@$(hostname)"
+
+# If none exists, suggest a local ssh key for easy uploads to GitHub
+echo " "
+echo -n "> Confirming a local SSH key exists..."
 if [ ! -f "$HOME/.ssh/id_ed25519.pub" ]; then
-    echo "no"
+    echo "not found"
     echo "  If you plan to push changes from this machine, do the following:"
     echo "  - ssh-keygen -q -t ed25519 -N '' -f ~/.ssh/id_ed25519 -C \"\$(hostname)\""
     echo "  - cat ~/.ssh/id_ed25519.pub"
@@ -163,6 +170,6 @@ case "$SHELL" in
     echo "  - chsh -s $(command -v zsh)" ;;
 esac
 
-echo 
+echo " " 
 echo "Done. Start a new login shell to effect changes."
 echo
