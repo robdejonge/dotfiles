@@ -16,14 +16,30 @@ else
   PROMPT+="%# "                        # privileged or not indication, default
 fi
 
-case "$(uname -s)" in                  # start prompt with operating system logo  
-
+case "$(uname -s)" in                  # start prompt with operating system logo 
   Linux*)
-    PROMPT=$'\U1F427'' '$PROMPT
+    LOGO=$'\U1F427' # Penguin
     ;;
-
   Darwin*)
-    PROMPT=$' '$PROMPT
+    LOGO=$''       # Apple logo
     ;;
+  FreeBSD*)
+    LOGO=$'\U1F479' # Devil
+    ;;
+  OpenBSD*)
+    LOGO=$'\U1F421' # Pufferfish
+    ;;
+  *)
+    LOGO=''         # Default fallback for unknown OS
+    ;;
+esac
 
+# Perform the UTF-8 safety check once for all OS types
+case "${LANG:-} ${LC_ALL:-} ${LC_CTYPE:-}" in
+  *UTF-8*|*utf8*)
+    PROMPT="$LOGO $PROMPT"
+    ;;
+  *)
+    PROMPT="$ $PROMPT"
+    ;;
 esac
