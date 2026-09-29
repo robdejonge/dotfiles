@@ -1,6 +1,8 @@
 set nocompatible
 set viminfo+=n$XDG_CACHE_HOME/vim/viminfo
-syntax on 
+if has('syntax') && !exists('g:syntax_on')
+  syntax enable
+endif
 
 set tabstop=4 
 set softtabstop=4
