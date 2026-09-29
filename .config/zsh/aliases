@@ -1,26 +1,16 @@
 ### COMMON ALIASES ###
 
-alias peel='ssh pi@peel.lan'
 alias pompia='ssh rob@pompia.lan'
 alias pomelo='ssh rob@pomelo.lan'
 alias navel='ssh rob@navel.lan'
 alias yuzu='ssh rob@yuzu.lan'
-alias kumquat='ssh rob@kumquat.lan'
 alias sshaddon='ssh hassio@navel.lan -p 2222'
+alias satsuma='ssh rob@satsuma.lan'
 
 alias list-ports='sudo lsof -i -P -n | grep LISTEN'
-alias list-leases='peel cat /opt/dnsmasq/var/lib/misc/dnsmasq.leases'
 
 alias log-sys='tail -f $SYSLOG'
 alias log-mqtt='mosquitto_sub -h mqtt.lan -t "#" -v'
-alias log-dhcp='peel sudo tail -n 20 -f /opt/dnsmasq/var/log/dnsmasq.log | grep "dnsmasq-dhcp\["'
-alias log-dns='peel sudo tail -n 20 -f /opt/dnsmasq/var/log/dnsmasq.log | grep "dnsmasq\["'
-alias log-srf-udp='kumquat docker logs srf-stick-receiver -f'
-alias log-srf-mqtt='kumquat docker logs mqtt-publisher -f'
-alias log-ha='navel docker logs homeassistant -f'
-alias log-nginx='peel tail -f /opt/nginx/var/log/nginx/access.log'
-alias log-zigbee='kumquat tail -f /usr/share/zigbee-bridge/logs/zigbee2mqtt.log'
-alias esphome='yuzu docker -it exec esphome esphome'
 
 # Show what would be committed
 alias dotfiles-status='dotfiles status -sb'
@@ -28,6 +18,8 @@ alias dotfiles-status='dotfiles status -sb'
 # Pull changes made on another machine
 alias dotfiles-pull='dotfiles pull --ff-only'
 
+# git stuff
+alias branch='git rev-parse --abbrev-ref HEAD'
 
 # colorized man pages
 man() {
@@ -45,9 +37,9 @@ man() {
 
 ### OS-SPECIFIC ALIASES ###
 
-case "$OSTYPE" in 
+case "$(uname -s)" in 
 
-  linux*)
+  Linux*)
     alias ls='ls --color=auto'
     alias grep='grep --color=auto'
     alias rbn='sudo shutdown --reboot now'
@@ -58,7 +50,7 @@ case "$OSTYPE" in
     alias dps='docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}" -a' 
     ;;
 
-  darwin*)
+  Darwin*)
     alias ls='ls -G'
     alias grep='grep --color=auto'
     alias rbn='sudo shutdown -h now'
@@ -68,8 +60,11 @@ case "$OSTYPE" in
     alias code='open -a "Visual Studio Code"'
     alias flushdns='dscacheutil -flushcache'
     ;;
+
+  FreeBSD*) 
+    ;;
     
-  openbsd*)
+  OpenBSD*)
     unset -f man 
     alias sudo='doas' 
     alias rbn='doas shutdown -r now'
