@@ -33,6 +33,19 @@ bindkey '^e' end-of-line
 bindkey '\e\e[D' backward-word
 bindkey '\e\e[C' forward-word
 
+# Set the terminal window title bar
+function set_terminal_title_preexec() {
+    print -Pn "\e]0;%n@%m: $1\a"
+}
+
+function set_terminal_title_precmd() {
+    print -Pn "\e]0;%n@%m: %~\a"
+}
+
+autoload -Uz add-zsh-hook
+add-zsh-hook preexec set_terminal_title_preexec
+add-zsh-hook precmd set_terminal_title_precmd
+
 # Load my other files
 for file in functions aliases path prompt; do 
 [ -f ${ZDOTDIR}/$file ] && source ${ZDOTDIR}/$file; done
