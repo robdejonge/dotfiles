@@ -16,23 +16,26 @@ else
   PROMPT+="%# "                        # privileged or not indication, default
 fi
 
-case "$(uname -s)" in                  # start prompt with operating system logo 
-  Linux*)   LOGO_HEX="\U1F427" ;; 
-  Darwin*)  LOGO_HEX="" ;;
+case "$(uname -s)" in                  # start prompt with operating system logo
+  Linux*)   LOGO_HEX="\U1F427" ;;
+  Darwin*)  LOGO_HEX="\UF8FF"  ;;      
   FreeBSD*) LOGO_HEX="\U1F608" ;;
   OpenBSD*) LOGO_HEX="\U1F421" ;;
   *)        LOGO_HEX="" ;;
 esac
 
-# Evaluate LOGO_HEX dynamically based on UTF-8 support
-case "${LANG:-}${LC_ALL:-}${LC_CTYPE:-}" in
+# Determine active locale based on standard precedence: LC_ALL > LC_CTYPE > LANG
+LOCAL_ENV="${LC_ALL:-${LC_CTYPE:-${LANG:-}}}"
+
+case "$LOCAL_ENV" in
   *[Uu][Tt][Ff]-8*|*[Uu][Tt][Ff]8*)
-    # Print via zsh/bash print builtin to parse \U escapes safely at runtime
-    LOGO=$(print -v LOGO -f "%b" "$LOGO_HEX" 2>/dev/null || printf "%b" "$LOGO_HEX")
+    # $'...' expansion in Zsh safely parses \Uxxxxxx Unicode escapes at runtime
+    LOGO="$(eval "print -n \"\$$'LOGO_HEX'\"" 2>/dev/null)"
     ;;
   *)
-    LOGO=''
+    LOGO=""
     ;;
 esac
 
 PROMPT="${LOGO}${PROMPT}"
+
