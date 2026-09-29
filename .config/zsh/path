@@ -14,17 +14,22 @@ deduplicate-path () { # call this from the end of your .zshrc
 
 # add to path for specific operating systems
 
-case "$OSTYPE" in 
+case "$(uname -s)" in 
 
-  linux*)
+  Linux*)
     add-to-path "/opt/local/bin"
     ;;
 
-  darwin*)
+  Darwin*)
     add-to-path "${HOME}/Scripts"
+    add-to-path "/opt/homebrew/bin"
+    add-to-path "/usr/local/opt/openvpn/sbin"
+    ;;
+
+  FreeBSD*)
     ;;
     
-  openbsd*)
+  OpenBSD*)
     ;;
 
 esac
@@ -32,3 +37,7 @@ esac
 # add to path for all operating systems
 
 add-to-path "${HOME}/.bin"
+add-to-path "${HOME}/.local/bin"
+add-to-path "/opt/local/bin"
+add-to-path "/opt/local/sbin"
+
