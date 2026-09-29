@@ -1,27 +1,23 @@
 set nocompatible
-set viminfo+=n$XDG_CACHE_HOME/vim/viminfo
+source ~/.config/vi/exrc
+
+set viminfo+=n$XDG_CACHE_HOME/vi/viminfo
 if has('syntax') && !exists('g:syntax_on')
   syntax enable
 endif
 
-set tabstop=4 
 set softtabstop=4
-set shiftwidth=4
-set expandtab
 set smartindent
-set ai
-
 set guicursor=
-set nu
+set number
 set nowrap
 set nohlsearch
-set noerrorbells
 set noswapfile
 set nobackup
 set undodir=$XDG_CACHE_HOME/vim/undodir
 set undofile
 set scrolloff=3
-set colorcolumn=129 
-
+set colorcolumn=129
 set cursorline
 highlight CursorLine cterm=NONE ctermbg=255
+

@@ -95,7 +95,7 @@ fi
 echo "> Creating runtime directories and files" 
 for d in \
     "$XDG_CACHE_HOME/zsh" \
-    "$XDG_CACHE_HOME/vim/undodir" \
+    "$XDG_CACHE_HOME/vi/undodir" \
     "$XDG_CACHE_HOME/less" \
     "$XDG_DATA_HOME/mail"
 do
@@ -103,6 +103,16 @@ do
 done
 
 touch "$XDG_CACHE_HOME/zsh/history" "$XDG_DATA_HOME/mail/mbox"
+
+echo "> Running OS-specific tasks, if any"
+
+case "$(uname -s)" in
+  OpenBSD)
+    if [ -f "$HOME/.config/vi/exrc" ]; then
+      ln -sfn "$HOME/.config/vi/exrc" "$HOME/.exrc"
+    fi
+    ;;
+esac
 
 echo "> Dotfiles setup complete"
 echo "-"

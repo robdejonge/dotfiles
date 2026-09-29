@@ -25,9 +25,8 @@ if [[ -o interactive ]]; then
   esac
 fi
 
-export MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc"
-export VIMINIT="source $XDG_CONFIG_HOME/vim/vimrc"
-export VIMDOTDIR="$XDG_CONFIG_HOME/vim"
+export VIMINIT="source $XDG_CONFIG_HOME/vi/vimrc"
+export VIMDOTDIR="$XDG_CONFIG_HOME/vi"
 export LESSHISTFILE=$XDG_CACHE_HOME/less/history
 
 export MAILRC=$XDG_CONFIG_HOME/mail/mailrc

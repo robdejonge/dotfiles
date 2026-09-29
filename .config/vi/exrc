@@ -1,0 +1,6 @@
+" Settings that apply to older versions of vi "
+set tabstop=4
+set shiftwidth=4
+set expandtab
+set autoindent
+set noerrorbells
