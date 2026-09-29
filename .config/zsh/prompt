@@ -17,9 +17,10 @@ else
 fi
 
 case "$(uname -s)" in                  # start prompt with operating system logo 
-  Linux*)   LOGO_HEX="\U1F427" ;;
+  Linux*)   LOGO_HEX="\U1F427" ;; 
   Darwin*)  LOGO_HEX="" ;;
   FreeBSD*) LOGO_HEX="\U1F608" ;;
+  OpenBSD*) LOGO_HEX="\U1F421" ;;
   *)        LOGO_HEX="" ;;
 esac
 
