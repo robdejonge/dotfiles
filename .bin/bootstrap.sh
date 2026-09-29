@@ -104,6 +104,7 @@ done
 touch "$XDG_CACHE_HOME/zsh/history" "$XDG_DATA_HOME/mail/mbox"
 
 echo "> Dotfiles setup complete"
+echo "-"
 
 
 # Report legacy shell files that zsh with ZDOTDIR will never read
