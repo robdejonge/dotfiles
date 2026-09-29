@@ -9,7 +9,6 @@ endif
 set softtabstop=4
 set smartindent
 set guicursor=
-set number
 set nowrap
 set nohlsearch
 set noswapfile

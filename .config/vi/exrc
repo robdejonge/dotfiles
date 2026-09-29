@@ -1,4 +1,5 @@
 " Settings that apply to older versions of vi "
+set number
 set tabstop=4
 set shiftwidth=4
 set expandtab
