@@ -17,25 +17,17 @@ else
 fi
 
 case "$(uname -s)" in                  # start prompt with operating system logo
-  Linux*)   LOGO_HEX="\U1F427" ;;
-  Darwin*)  LOGO_HEX="\UF8FF"  ;;      
-  FreeBSD*) LOGO_HEX="\U1F608" ;;
-  OpenBSD*) LOGO_HEX="\U1F421" ;;
-  *)        LOGO_HEX="" ;;
+  Linux*)   LOGO=$'\xf0\x9f\x90\xa7' ;;  # U+1F427
+  Darwin*)  LOGO=$'\xef\xa3\xbf'     ;;  # U+F8FF
+  FreeBSD*) LOGO=$'\xf0\x9f\x98\x88' ;;  # U+1F608
+  OpenBSD*) LOGO=$'\xf0\x9f\x90\xa1' ;;  # U+1F421
+  *)        LOGO="" ;;
 esac
 
-# Determine active locale based on standard precedence: LC_ALL > LC_CTYPE > LANG
-LOCAL_ENV="${LC_ALL:-${LC_CTYPE:-${LANG:-}}}"
-
-case "$LOCAL_ENV" in
-  *[Uu][Tt][Ff]-8*|*[Uu][Tt][Ff]8*)
-    # $'...' expansion in Zsh safely parses \Uxxxxxx Unicode escapes at runtime
-    LOGO="$(eval "print -n \"\$$'LOGO_HEX'\"" 2>/dev/null)"
-    ;;
-  *)
-    LOGO=""
-    ;;
+# Only keep the logo if the locale is UTF-8 (LC_ALL > LC_CTYPE > LANG)
+case "${LC_ALL:-${LC_CTYPE:-${LANG:-}}}" in
+  *[Uu][Tt][Ff]-8*|*[Uu][Tt][Ff]8*) ;;
+  *) LOGO="" ;;
 esac
 
 PROMPT="${LOGO}${PROMPT}"
-
