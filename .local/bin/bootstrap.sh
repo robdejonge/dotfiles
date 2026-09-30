@@ -1,187 +1,330 @@
 #!/bin/sh
 #
-# Usage: 
+# Bootstraps my environment into a new shell account
+#
+# Usage:
 # sh -c "$(curl -fsSL "https://raw.githubusercontent.com/robdejonge/dotfiles/main/.local/bin/bootstrap.sh?$(date +%s)")"
 #
 # Source:
 # https://github.com/robdejonge/dotfiles/
 
-# Change these if you fork this repo 
+set -eu
+
+# ---------------------------------------------------------------------------
+# Configuration (change these if you fork this repo)
+# ---------------------------------------------------------------------------
 GHUSERNAME="robdejonge"
 GHREPONAME="dotfiles"
 
 REPO_HTTPS="https://github.com/${GHUSERNAME}/${GHREPONAME}.git"
 REPO_SSH="git@github.com:${GHUSERNAME}/${GHREPONAME}.git"
-BRANCH="${DOTFILES_BRANCH:-main}"
-DIR="$HOME/.${GHREPONAME}"
+BRANCH="main"
+REPO_DIR="$HOME/.${GHREPONAME}"
 BACKUP="$HOME/.original-${GHREPONAME}-backup-$(date +%Y%m%d-%H%M%S)"
+BACKUP_CONFLICTS="$BACKUP/conflicts" 
+BACKUP_LEGACY="$BACKUP/legacy"    
+EXCLUDE="README.md"  
 
-echo "> Starting dotfiles setup...."
+# Runtime state (1 to remove a partial $REPO_DIR if failed) 
+CLEANUP_DIR=0         
 
+# ---------------------------------------------------------------------------
+# Output helpers
+# ---------------------------------------------------------------------------
 
-# Hard dependencies: fail fast if either is missing
-echo -n "> Checking dependencies..."
-missing=""
-pkgs=""
-command -v git >/dev/null 2>&1 || { missing="$missing git"; pkgs="$pkgs git"; }
-command -v zsh >/dev/null 2>&1 || { missing="$missing zsh"; pkgs="$pkgs zsh"; }
+NEXT_STEPS=""          
+NL='
+'
 
-if [ -n "$missing" ]; then
-    echo "failed"
-    echo "  ERROR: missing required tools:$missing" >&2
-    echo "  - Debian/Ubuntu: sudo apt-get install -y$pkgs" >&2
-    echo "  - FreeBSD:       sudo pkg install -y$pkgs" >&2
-    echo "  - macOS:         git: xcode-select --install ; zsh: preinstalled" >&2
-    exit 1
-fi
+say()    { printf '> %s\n' "$*"; } 
+begin()  { printf '> %s...' "$*"; }
+finish() { printf '%s\n' "$*"; }  
+info()   { printf '  %s\n' "$*"; }
 
-echo "ok"
-
-# Do not overwrite an existing install
-echo -n "> Checking for existing install..."
-
-dotfiles() { git --git-dir="$DIR" --work-tree="$HOME" "$@"; }
-
-cd "$HOME"
-
-if [ -e "$DIR" ]; then
-    echo "found" 
-    echo "  ERROR: $DIR already exists; refusing to continue." >&2
-    exit 1
-fi
-
-echo "not found, proceeding" 
-
-# Downloading repo
-echo "> Cloning ${REPO_HTTPS}"
-git clone --quiet --bare --branch "$BRANCH" "$REPO_HTTPS" "$DIR"
-dotfiles config --local status.showUntrackedFiles no
-
-# Move aside anything checkout would overwrite
-echo -n "> Checking for conflicts..."
-if ! dotfiles checkout 2>/dev/null; then
-    echo "conflict detected"
-    mkdir -p "$BACKUP"
-    dotfiles checkout 2>&1 | grep -E '^[[:space:]]+' | awk '{print $1}' | while read -r f; do
-        mkdir -p "$BACKUP/$(dirname "$f")"
-        mv "$HOME/$f" "$BACKUP/$f"
-        echo "  - Moved existing $f to $BACKUP/$f"
+# die "message" ["extra line" ...]
+die() {
+    printf '  ERROR: %s\n' "$1" >&2
+    shift
+    for line in "$@"; do
+        printf '  %s\n' "$line" >&2
     done
-    dotfiles checkout
-else 
-    echo "none found"
-fi
+    exit 1
+}
 
-# README belongs on GitHub, not in $HOME
-echo "> Deleting README locally, not on repo" 
-dotfiles update-index --assume-unchanged README.md
-rm -f "$HOME/README.md"
+# note "heading" ["item" ...] -- queue a suggestion for the final block
+note() {
+    heading=$1
+    shift
+    NEXT_STEPS="${NEXT_STEPS}> ${heading}${NL}"
+    for item in "$@"; do
+        NEXT_STEPS="${NEXT_STEPS}  - ${item}${NL}"
+    done
+    NEXT_STEPS="${NEXT_STEPS}${NL}"
+}
 
-# Tracking + push over SSH (no key needed for the clone itself)
-echo "> Configuring git for this repo" 
-dotfiles config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
-dotfiles fetch origin
-dotfiles config branch."$BRANCH".remote origin
-dotfiles config branch."$BRANCH".merge refs/heads/"$BRANCH"
-dotfiles remote set-url --push origin "$REPO_SSH"
-
-# Create runtime directories and files expected by the dotfiles
-echo "> Loading environment"
-
-if [ -r "$HOME/.config/zsh/environment" ]; then
-    . "$HOME/.config/zsh/environment"
-fi
-
-echo "> Creating runtime directories and files" 
-for d in \
-    "$XDG_CACHE_HOME/zsh" \
-    "$XDG_CACHE_HOME/vi/undodir" \
-    "$XDG_CACHE_HOME/less" \
-    "$XDG_DATA_HOME/mail"
-do
-    mkdir -p "$d"
-done
-
-touch "$XDG_CACHE_HOME/zsh/history" "$XDG_DATA_HOME/mail/mbox"
-
-echo "> Running OS-specific tasks, if any"
-
-case "$(uname -s)" in
-  OpenBSD)
-    if [ -f "$HOME/.config/vi/exrc" ]; then
-      ln -sfn "$HOME/.config/vi/exrc" "$HOME/.exrc"
+# Runs on every exit. On failure, removes a half-finished install so the
+# script can simply be run again.
+cleanup() {
+    status=$?
+    trap - EXIT
+    if [ "$status" -ne 0 ]; then
+        echo >&2
+        if [ "$CLEANUP_DIR" -eq 1 ]; then
+            rm -rf "$REPO_DIR"
+            printf '  Removed the partial install at %s; it is safe to re-run.\n' "$REPO_DIR" >&2
+        fi
+        if [ -d "$BACKUP" ]; then
+            printf '  Files moved aside earlier are in %s\n' "$BACKUP" >&2
+        fi
     fi
-    ;;
-esac
+    exit "$status"
+}
 
-echo "> Dotfiles setup complete"
-echo "-"
+# The bare repo, with $HOME as its work tree
+dotfiles() { git --git-dir="$REPO_DIR" --work-tree="$HOME" "$@"; }
 
+# ---------------------------------------------------------------------------
+# Install steps
+# ---------------------------------------------------------------------------
 
-# Report legacy shell files that zsh with ZDOTDIR will never read
-echo " "
-echo -n "> Looking for existing shell configuration files..." 
-
-found=""
-for f in .profile .bash_profile .bash_login .bash_logout .bashrc .zshrc .zprofile .zlogin .zlogout; do
-    [ -f "$HOME/$f" ] && found="$found $f"
-done
-
-if [ -n "$found" ]; then
-    echo "found: "
-    for f in $found; do
-        printf '  - %-16s %s\n' "$f" "$(wc -l < "$HOME/$f") lines"
+# Hard dependencies: fail fast if any is missing
+check_deps() {
+    begin "Checking dependencies"
+    missing=""
+    for tool in git zsh; do
+        command -v "$tool" >/dev/null 2>&1 || missing="$missing $tool"
     done
-    echo ""
-    echo "  These files are not part of and not managed by this repo. They will not be"
-    echo "  read by zsh with ZDOTDIT set. Check them for host-specific settings such"
-    echo "  as path, proxies, tokens, before removing." 
-    if [ -t 0 ] && [ -z "$DOTFILES_NONINTERACTIVE" ]; then
-        echo ""
-        printf '  Move them to %s? [y/N] ' "$BACKUP"
-        read -r answer
+    if [ -n "$missing" ]; then
+        finish "failed"
+        die "missing required tools:$missing" \
+            "- Debian/Ubuntu: sudo apt-get install -y$missing" \
+            "- FreeBSD:       sudo pkg install -y$missing" \
+            "- OpenBSD:       doas pkg_add$missing" \
+            "- macOS:         git: xcode-select --install ; zsh: preinstalled"
+    fi
+    finish "ok"
+}
+
+# Never overwrite an existing install
+refuse_if_installed() {
+    begin "Checking for existing install"
+    if [ -e "$REPO_DIR" ] || [ -L "$REPO_DIR" ]; then
+        finish "found"
+        die "$REPO_DIR already exists; refusing to continue." \
+            "To update it:  git --git-dir=$REPO_DIR --work-tree=$HOME pull" \
+            "To reinstall:  rm -rf $REPO_DIR   (files already in \$HOME are left in place)"
+    fi
+    finish "not found, proceeding"
+}
+
+# Clone as a bare repo
+clone_repo() {
+    say "Cloning ${REPO_HTTPS}"
+    CLEANUP_DIR=1
+    git clone --quiet --bare --branch "$BRANCH" "$REPO_HTTPS" "$REPO_DIR"
+    dotfiles config --local status.showUntrackedFiles no
+
+    mkdir -p "$REPO_DIR/info"
+    printf '/*\n!/%s\n' "$EXCLUDE" > "$REPO_DIR/info/sparse-checkout"
+    dotfiles config --local core.sparseCheckout true
+}
+
+# Some git config 
+configure_remote() {
+    say "Configuring git for this repo"
+    dotfiles config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
+    dotfiles fetch --quiet origin
+    dotfiles config branch."$BRANCH".remote origin
+    dotfiles config branch."$BRANCH".merge "refs/heads/$BRANCH"
+    dotfiles remote set-url --push origin "$REPO_SSH"
+}
+
+# Move aside anything the checkout would overwrite
+backup_conflicts() {
+    begin "Checking for conflicts"
+    tracked=$(dotfiles -c core.quotePath=false ls-tree -r --name-only HEAD)
+    moved=0
+    while IFS= read -r f; do
+        if [ -z "$f" ]; then
+            continue
+        fi
+        if [ -e "$HOME/$f" ] || [ -L "$HOME/$f" ]; then
+            if [ "$moved" -eq 0 ]; then
+                finish "conflict detected"
+            fi
+            mkdir -p "$BACKUP_CONFLICTS/$(dirname "$f")"
+            mv "$HOME/$f" "$BACKUP_CONFLICTS/$f"
+            info "- Moved existing $f to $BACKUP_CONFLICTS/$f"
+            moved=$((moved + 1))
+        fi
+    done <<EOF
+$tracked
+EOF
+    if [ "$moved" -eq 0 ]; then
+        finish "none found"
+    fi
+}
+
+# The only step that writes tracked files into $HOME
+checkout_repo() {
+    say "Checking out '${BRANCH}' branch"
+    dotfiles checkout --quiet
+    CLEANUP_DIR=0    
+}
+
+# Create runtime directories and files, executed by zsh as it will 
+# read and have access to environment variables set within
+init_runtime_dirs() {
+    say "Creating runtime directories and files"
+    zsh -c '
+        : "${XDG_CACHE_HOME:=$HOME/.cache}"
+        : "${XDG_DATA_HOME:=$HOME/.local/share}"
+        mkdir -p "$XDG_CACHE_HOME/zsh" \
+                 "$XDG_CACHE_HOME/vi/undodir" \
+                 "$XDG_CACHE_HOME/less" \
+                 "$XDG_DATA_HOME/mail"
+        touch "$XDG_CACHE_HOME/zsh/history" "$XDG_DATA_HOME/mail/mbox"
+    '
+}
+
+os_tasks() {
+    say "Running OS-specific tasks, if any"
+    case "$(uname -s)" in
+        OpenBSD)
+            if [ -f "$HOME/.config/vi/exrc" ]; then
+                ln -sfn "$HOME/.config/vi/exrc" "$HOME/.exrc"
+            fi
+            ;;
+    esac
+}
+
+# Report and move legacy shell files
+report_legacy_shell_files() {
+    begin "Looking for existing shell configuration files"
+    found=""
+    for f in .profile .bash_profile .bash_login .bash_logout .bashrc \
+             .zshrc .zprofile .zlogin .zlogout; do
+        if [ -f "$HOME/$f" ]; then
+            found="$found $f"
+        fi
+    done
+
+    if [ -z "$found" ]; then
+        finish "not found"
+        return 0
+    fi
+
+    finish "found:"
+    for f in $found; do
+        printf '  - %-16s %s lines\n' "$f" "$(wc -l < "$HOME/$f" | tr -d ' ')"
+    done
+    echo
+    info "These files are not managed by this repo and will not be read by zsh"
+    info "with ZDOTDIR set. Check them for host-specific settings (PATH, proxies,"
+    info "tokens) before removing them."
+
+    if [ -t 0 ]; then
+        echo
+        printf '  Move them to %s? [y/N] ' "$BACKUP_LEGACY"
+        read -r answer || answer=""
         case "$answer" in
             y|Y)
-                echo -n "  Moving..."
-                mkdir -p "$BACKUP"
-                for f in $found; do mv "$HOME/$f" "$BACKUP/$f"; done
+                printf '  Moving...'
+                mkdir -p "$BACKUP_LEGACY"
+                for f in $found; do
+                    mv "$HOME/$f" "$BACKUP_LEGACY/$f"
+                done
                 echo "done"
-                echo "  Review in $BACKUP/"
+                info "Review them in $BACKUP_LEGACY/"
                 ;;
-            *) echo "  Left in place." ;;
-
+            *)
+                info "Left in place."
+                ;;
         esac
+    else
+        info "Not prompting (non-interactive); left in place."
     fi
-else 
-    echo "not found" 
-fi
+}
 
-# Suggest a client ssh, for easy access
-echo " "
-echo "> Consider installing a client SSH key for easy access to this shell:"
-echo "  - ssh-copy-id $(id -un)@$(hostname)"
+# Some handy suggestions after the environment was installed
+has_local_ssh_key() {
+    for k in "$HOME"/.ssh/id_*.pub; do
+        if [ -f "$k" ]; then
+            return 0
+        fi
+    done
+    return 1
+}
 
-# If none exists, suggest a local ssh key for easy uploads to GitHub
-echo " "
-echo -n "> Confirming a local SSH key exists..."
-if [ ! -f "$HOME/.ssh/id_ed25519.pub" ]; then
-    echo "not found"
-    echo "  If you plan to push changes from this machine, do the following:"
-    echo "  - ssh-keygen -q -t ed25519 -N '' -f ~/.ssh/id_ed25519 -C \"\$(hostname)\""
-    echo "  - cat ~/.ssh/id_ed25519.pub"
-    echo "  - Add at https://github.com/${GHUSERNAME}/${GHREPONAME}/settings/keys/new"
-else 
-    echo "ok"
-fi
+suggest_client_key() {
+    note "For easy access to this machine, run this from your other machine:" \
+        "ssh-copy-id $(id -un)@$(hostname)"
+}
 
-# Helpful warning only: zsh is installed but not the default shell
-case "$SHELL" in
-    */zsh) : ;;
-    *) echo 
-    echo "> Please note the default shell is $SHELL, not zsh. To change:"
-    echo "  - chsh -s $(command -v zsh)" ;;
-esac
+suggest_local_key() {
+    if has_local_ssh_key; then
+    note "Local SSH key found. To push changes from this machine: " \
+        "Add it at https://github.com/${GHUSERNAME}/${GHREPONAME}/settings/keys/new and tick \"Allow write access\""
+        return 0
+    fi
+    note "No local SSH key found. To push changes from this machine:" \
+        "ssh-keygen -q -t ed25519 -f ~/.ssh/id_ed25519 -C \"\$(hostname)\"" \
+        "cat ~/.ssh/id_ed25519.pub" \
+        "Add it at https://github.com/${GHUSERNAME}/${GHREPONAME}/settings/keys/new and tick \"Allow write access\""
+}
 
-echo " " 
-echo "Done. Start a new login shell to effect changes."
-echo
+suggest_default_shell() {
+    case "${SHELL:-}" in
+        */zsh) ;;
+        *)
+            note "The default shell is ${SHELL:-unknown}, not zsh. To change it:" \
+                "chsh -s \"\$(command -v zsh)\""
+            ;;
+    esac
+}
+
+print_next_steps() {
+    if [ -n "$NEXT_STEPS" ]; then
+        echo
+        echo "Next steps"
+        echo "----------"
+        printf '%s' "$NEXT_STEPS"
+    fi
+    echo "Done. "
+    echo 
+    echo "Start a new login shell to apply the changes."
+    echo
+}
+
+# ---------------------------------------------------------------------------
+
+main() {
+    # clean up no matter how we crash, if we crash
+    trap cleanup EXIT
+    trap 'exit 129' HUP
+    trap 'exit 130' INT
+    trap 'exit 143' TERM
+
+    # actual script starts
+    say "Dotfiles setup started"
+    cd "$HOME" || die "cannot cd to $HOME"
+
+    check_deps
+    refuse_if_installed
+    clone_repo
+    configure_remote
+    backup_conflicts
+    checkout_repo
+    init_runtime_dirs
+    os_tasks
+    report_legacy_shell_files
+
+    suggest_client_key
+    suggest_local_key
+    suggest_default_shell
+
+    say "Dotfiles setup complete"
+    print_next_steps
+}
+
+main "$@"
