@@ -2,69 +2,47 @@
 
 Although many options exist, ranging from custom scripts to tools such as Stow, when looking for a solution I felt the bare Git repo was the most elegant of all available. The idea came from https://www.atlassian.com/git/tutorials/dotfiles, and a few instructions are outlined below. 
 
-### Guiding principles used for this repository
+### Outline
 
-- Uses the XDG Base Directory Specification, explicitly defining the default values to announce this
-- User-specific configuration files (.config) are only added to the repository if I edited them; why save defaults?
+- Uses the XDG Base Directory Specification
+- The same repo is used across macOS, Debian, FreeBSD and OpenBSD
 
-### Initial setup
+### Installation 
 
-I like using .repo as the directory in which the Git repo is stored. Again, this is a bare repo and so the work space (work tree) is my actual home directory. Follow these steps if you want to create your own version of a 'dot files' repository using a bare Git repo. If you want to use mine (no idea why you would), follow the steps below for a new machine. 
+To download this repo and install in a new shell, run
 
-Step 1. Create the repository
+    sh -c "$(curl -fsSL "https://raw.githubusercontent.com/robdejonge/dotfiles/main/.local/bin/bootstrap.sh?$(date +%s)")"
 
-    git init $HOME/.repo
-Step 2. Add an alias to your current shell and where you store your aliases (.zshrc in the example below)  
+To re-install this repo, you must delete `~/.dotfiles` first or it won't run
 
-    alias config='/usr/bin/git --git-dir=$HOME/.repo --work-tree=$HOME'
-    echo "alias config='/usr/bin/git --git-dir=$HOME/.repo --work-tree=$HOME'" >>$HOME/.zshrc
-Step 3. Make sure untracked files aren't shown, as there would be MANY. First time using the alias!
+The bootstrap script 
 
-    config config --local status.showUntrackedFiles no
-Step 4. Add the files you with to track
-
-    config add .zshrc
-    config add .vimrc
-Step 5. When you've made changes, commit them to the repository
-
-    config commit -m "Added .zshrc and .vimrc"
-Step 6. Push your repository to your server of choice, if you want
-
-    git remote add origin  <REMOTE_URL>
-    git push -u origin main
+- POSIX compliant, runs in `/bin/sh`
+- Requires git and zsh to be installed on the local system 
+- Will back up any files it might overwrite
+- Will offer to back up legacy shell files
+- Provides a few basic suggestions at the end
     
-### Using on a new machine
+### After installation
 
-Step 1. Ignore the repository in any other reposities that might be there
+When a new shell opens, this checks if local changes should be uploaded or remote changes downloaded. This is throttled and actually happens only once every 24 hours. It can also be run manually, but this is also beholden to the throttling. 
 
-    echo ".repo" >> .gitignore
+    dotfiles-check
     
-Step 2. Clone the repository from your server of choice into the local location 
+To review staged changes made locally 
 
-    git clone --bare git@github.com:robdejonge/dotfiles.git $HOME/.repo
+    dotfiles-status
+
+To push changes to the remote 
+
+    dotfiles-push "Commit message"
     
-Step 3. Add a setting to not show untracked files (I create no alias, as I assume aliases will soon be loaded!) 
+To pull changes from the remote
 
-    git --git-dir=$HOME/.repo --work-tree $HOME config --local status.showUntrackedFiles no
+    dotfiles-pull 
+
+Other git actions 
+
+    dotfiles <additional options and parameters>
     
-Step 4. Put all the files stored in the repo, in their actual locations
-
-    git --git-dir=$HOME/.repo --work-tree $HOME checkout
-
-Step 5. Set upstream to push changes
-
-    git --git-dir=$HOME/.repo --work-tree $HOME push --set-upstream origin main
-
-Step 6. Get rid of the README file in your home directory, it's only useful on GitHub 
-
-    git --git-dir=$HOME/.repo --work-tree $HOME update-index --assume-unchanged $HOME/README.md
-    rm $HOME/README.md
-    
-Step 7. Run the init script once and once only
-
-    $HOME/.bin/repo-install.sh
-    
-Step 8. Close and open your shell window
-
-
 If things aren't working, please refer to the original blog post from which all this was derives for additional information and steps to take. 
