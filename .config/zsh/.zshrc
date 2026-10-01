@@ -22,6 +22,11 @@ _comp_options+=(globdots)		# Include hidden files.
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 export CASE_SENSITIVE=true
 
+# Edit command line in vi 
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey '^X^E' edit-command-line
+
 # Use ctrl-l, ctrl-v to paste the output of the last command
 zmodload -i zsh/parameter
 insert-last-command-output() { 
