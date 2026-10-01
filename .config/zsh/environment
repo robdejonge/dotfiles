@@ -2,6 +2,7 @@
 export XDG_CACHE_HOME=$HOME/.cache
 export XDG_CONFIG_HOME=$HOME/.config
 export XDG_DATA_HOME=$HOME/.local/share
+export XDG_STATE_HOME=$HOME/.local/state
 
 # editor 
 export EDITOR=vi
@@ -27,7 +28,7 @@ fi
 
 export VIMINIT="source $XDG_CONFIG_HOME/vi/vimrc"
 export VIMDOTDIR="$XDG_CONFIG_HOME/vi"
-export LESSHISTFILE=$XDG_CACHE_HOME/less/history
+export LESSHISTFILE=$XDG_STATE_HOME/less/history
 
 export MAILRC=$XDG_CONFIG_HOME/mail/mailrc
 export MBOX=$XDG_DATA_HOME/mail/mbox

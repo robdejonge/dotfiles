@@ -6,7 +6,7 @@ autoload -U colors && colors
 setopt HIST_SAVE_NO_DUPS
 setopt inc_append_history
 setopt share_history
-export HISTFILE=${XDG_CACHE_HOME}/zsh/history
+export HISTFILE=${XDG_STATE_HOME}/zsh/history
 export HISTSIZE=10000000
 export SAVEHIST=10000000
 

@@ -177,18 +177,20 @@ checkout_repo() {
 init_runtime_dirs() {
     say "Creating runtime directories and files"
     zsh -c '
-        : "${XDG_CACHE_HOME:=$HOME/.cache}"
-        : "${XDG_DATA_HOME:=$HOME/.local/share}"
-        mkdir -p "$XDG_CACHE_HOME/zsh" \
-                 "$XDG_CACHE_HOME/vi/undodir" \
-                 "$XDG_CACHE_HOME/less" \
-                 "$XDG_DATA_HOME/mail"
-        touch "$XDG_CACHE_HOME/zsh/history" "$XDG_DATA_HOME/mail/mbox"
-    '
+    : "${XDG_CACHE_HOME:=$HOME/.cache}"
+    : "${XDG_DATA_HOME:=$HOME/.local/share}"
+    : "${XDG_STATE_HOME:=$HOME/.local/state}"
+    mkdir -p "$XDG_CACHE_HOME/zsh" \
+             "$XDG_CACHE_HOME/less" \
+             "$XDG_STATE_HOME/zsh" \
+             "$XDG_STATE_HOME/vi/undodir" \
+             "$XDG_DATA_HOME/mail"
+    touch "$XDG_STATE_HOME/zsh/history" "$XDG_DATA_HOME/mail/mbox"
+'
 }
 
 # Create local override files for machine-specific zsh settings
-init_local_files() {
+init_local_zsh_files() {
     say "Creating machine-specific zsh files, if missing"
     zsh -c '
         : "${ZDOTDIR:=$HOME}"
@@ -330,6 +332,7 @@ main() {
     backup_conflicts
     checkout_repo
     init_runtime_dirs
+    init_local_zsh_files
     os_tasks
     report_legacy_shell_files
 

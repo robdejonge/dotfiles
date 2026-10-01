@@ -13,7 +13,7 @@ set nowrap
 set nohlsearch
 set noswapfile
 set nobackup
-set undodir=$XDG_CACHE_HOME/vim/undodir
+set undodir=$XDG_STATE_HOME/vi/undodir
 set undofile
 set scrolloff=3
 set colorcolumn=129
