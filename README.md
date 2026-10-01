@@ -13,7 +13,11 @@ To download this repo and install in a new shell, run
 
     sh -c "$(curl -fsSL "https://raw.githubusercontent.com/robdejonge/dotfiles/main/.local/bin/bootstrap.sh?$(date +%s)")"
 
-To re-install this repo, you must delete `~/.dotfiles` first or it won't run
+Or if `curl` is not installed, try
+
+    sh -c "$(wget -qO- "https://raw.githubusercontent.com/robdejonge/dotfiles/main/.local/bin/bootstrap.sh?$(date +%s)")"
+
+To re-install this repo using the bootstrap script, you must delete `~/.dotfiles` first or it won't run
 
 The bootstrap script 
 
