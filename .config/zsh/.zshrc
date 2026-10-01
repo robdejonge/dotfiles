@@ -60,3 +60,6 @@ deduplicate-path
 
 # Check if dotfiles need updating
 dotfiles-check
+
+# Load any machine-specific local stuff, if it exists
+[[ -r $ZDOTDIR/zshrc.local ]] && source $ZDOTDIR/zshrc.local

@@ -1,0 +1,41 @@
+#!/bin/bash
+
+ME="${0##*/}"
+CACHE_DIR="$XDG_CACHE_HOME/$ME"
+STATE_PATH_FILE="$CACHE_DIR/state"
+
+# Function to generate current snapshot of dotfile/dotdirectory paths (non-recursive)
+generate_path_snapshot() {
+  find "$HOME" -maxdepth 1 -name ".*" -print | sort
+}
+
+# Function to update the state file with current snapshot of paths
+update_state() {
+  mkdir -p "$CACHE_DIR"
+  generate_path_snapshot > "$STATE_PATH_FILE"
+  echo "Path state file updated at $STATE_PATH_FILE"
+}
+
+# Function to show only added dotfiles/directories (paths present now but absent in saved state)
+check_added() {
+  if [[ ! -f "$STATE_PATH_FILE" ]]; then
+    echo "No state file found. Run with 'update' first to create one."
+    return 1
+  fi
+
+  CURRENT_PATH_SNAPSHOT=$(mktemp)
+  generate_path_snapshot > "$CURRENT_PATH_SNAPSHOT"
+
+  comm -13 "$STATE_PATH_FILE" "$CURRENT_PATH_SNAPSHOT"
+
+  rm "$CURRENT_PATH_SNAPSHOT"
+}
+
+# Main logic
+if [[ "$1" == "update" ]]; then
+  update_state
+elif [[ "$1" == "check" ]]; then
+  check_added
+else
+  echo "Usage: $0 {update|check}"
+fi

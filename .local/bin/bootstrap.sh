@@ -187,6 +187,20 @@ init_runtime_dirs() {
     '
 }
 
+# Create local override files for machine-specific zsh settings
+init_local_files() {
+    say "Creating machine-specific zsh files, if missing"
+    zsh -c '
+        : "${ZDOTDIR:=$HOME}"
+        for f in "$ZDOTDIR/zshenv.local" "$ZDOTDIR/zshrc.local"; do
+            if [ ! -e "$f" ] && [ ! -L "$f" ]; then
+                printf "# Machine-specific settings. Not tracked by git.\n" > "$f"
+                printf "  - Created %s\n" "$f"
+            fi
+        done
+    '
+}
+
 os_tasks() {
     say "Running OS-specific tasks, if any"
     case "$(uname -s)" in
