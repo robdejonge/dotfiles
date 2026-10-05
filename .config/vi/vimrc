@@ -2,8 +2,13 @@
 source $XDG_CONFIG_HOME/vi/exrc
 
 " load vim defaults
-unlet! g:skip_defaults_vim
-source $VIMRUNTIME/defaults.vim
+if exists('*has') && has('eval')
+  let s:defaults = $VIMRUNTIME . '/defaults.vim'
+
+    if filereadable(s:defaults)
+        execute 'source ' . fnameescape(s:defaults)
+     endif
+endif
 
 " undo & recovery bits
 set noswapfile
@@ -38,5 +43,8 @@ augroup END
 doautocmd ColorScheme
 
 set background=light
-colorscheme lunaperche
-
+if !empty(globpath(&runtimepath, 'colors/lunaperche.vim'))
+  colorscheme lunaperche
+  else
+    colorscheme default
+endif
